@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AES Connect - Chiffrement Sécurisé</title>
+    <title>AESConnect - Réseau Social</title>
     <style>
         * {
             margin: 0;
@@ -12,42 +12,495 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f0f2f5;
+            line-height: 1.6;
         }
 
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-        }
-
+        /* Header */
         .header {
-            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            background: #1877f2;
             color: white;
-            padding: 30px;
-            text-align: center;
+            padding: 12px 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            font-weight: 300;
+            font-size: 28px;
+            font-weight: bold;
         }
 
-        .header p {
-            opacity: 0.9;
-            font-size: 1.1em;
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
         }
 
+        .header-actions button {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+
+        .header-actions button:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #42b883;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        /* Main Container */
+        .main-container {
+            margin-top: 70px;
+            display: flex;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            height: fit-content;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .sidebar-section {
+            margin-bottom: 25px;
+        }
+
+        .sidebar-section h3 {
+            margin-bottom: 15px;
+            color: #1c1e21;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .sidebar-item {
+            padding: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar-item:hover {
+            background: #f0f2f5;
+        }
+
+        .sidebar-item.active {
+            background: #e3f2fd;
+            color: #1877f2;
+        }
+
+        /* Main Content */
         .main-content {
-            padding: 40px;
+            flex: 1;
+            max-width: 680px;
         }
+
+        /* Create Post */
+        .create-post {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .create-post textarea {
+            width: 100%;
+            border: none;
+            resize: none;
+            font-size: 16px;
+            padding: 12px;
+            border-radius: 8px;
+            background: #f0f2f5;
+            margin-bottom: 15px;
+            font-family: inherit;
+        }
+
+        .create-post textarea:focus {
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 2px #1877f2;
+        }
+
+        .post-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn {
+            background: #1877f2;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            background: #166fe5;
+        }
+
+        .btn-secondary {
+            background: #42b883;
+        }
+
+        .btn-secondary:hover {
+            background: #369870;
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: #65676b;
+            border: 1px solid #ccd0d5;
+        }
+
+        .btn-outline:hover {
+            background: #f0f2f5;
+        }
+
+        /* Posts */
+        .post {
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .post-header {
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid #e4e6ea;
+        }
+
+        .post-author {
+            flex: 1;
+        }
+
+        .post-author-name {
+            font-weight: 600;
+            color: #1c1e21;
+            margin-bottom: 2px;
+        }
+
+        .post-time {
+            color: #65676b;
+            font-size: 13px;
+        }
+
+        .post-content {
+            padding: 15px 20px;
+            color: #1c1e21;
+            font-size: 15px;
+            line-height: 1.4;
+        }
+
+        .post-actions-bar {
+            padding: 8px 20px;
+            border-top: 1px solid #e4e6ea;
+            display: flex;
+            gap: 10px;
+        }
+
+        .post-action {
+            flex: 1;
+            background: none;
+            border: none;
+            padding: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            color: #65676b;
+            font-weight: 600;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .post-action:hover {
+            background: #f0f2f5;
+        }
+
+        .post-action.liked {
+            color: #1877f2;
+        }
+
+        /* Right Panel */
+        .right-panel {
+            width: 280px;
+        }
+
+        .panel-section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .panel-section h3 {
+            margin-bottom: 15px;
+            color: #1c1e21;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        /* Auth Forms */
+        .auth-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .auth-form {
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .auth-form h2 {
+            margin-bottom: 20px;
+            color: #1c1e21;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #1c1e21;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #dddfe2;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.2s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #1877f2;
+            box-shadow: 0 0 0 2px rgba(24, 119, 242, 0.2);
+        }
+
+        .auth-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .auth-actions button {
+            flex: 1;
+        }
+
+        /* Notifications */
+        .notification {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 6px;
+            color: white;
+            font-weight: 500;
+            z-index: 3000;
+            opacity: 0;
+            transform: translateX(100px);
+            transition: all 0.3s;
+        }
+
+        .notification.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            background: #42b883;
+        }
+
+        .notification.error {
+            background: #e74c3c;
+        }
+
+        /* Groups */
+        .group-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .group-item:hover {
+            background: #f0f2f5;
+        }
+
+        .group-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 6px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .group-info h4 {
+            margin-bottom: 2px;
+            color: #1c1e21;
+            font-size: 14px;
+        }
+
+        .group-info p {
+            color: #65676b;
+            font-size: 12px;
+        }
+
+        /* Messages */
+        .message-item {
+            display: flex;
+            gap: 10px;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .message-item:hover {
+            background: #f0f2f5;
+        }
+
+        .message-item.unread {
+            background: #e3f2fd;
+        }
+
+        .message-info h4 {
+            margin-bottom: 2px;
+            color: #1c1e21;
+            font-size: 14px;
+        }
+
+        .message-preview {
+            color: #65676b;
+            font-size: 13px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 200px;
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #65676b;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+                padding: 10px;
+            }
+
+            .sidebar, .right-panel {
+                width: 100%;
+                order: 2;
+            }
+
+            .main-content {
+                order: 1;
+            }
+
+            .header {
+                padding: 10px 15px;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .header-actions {
+                gap: 10px;
+            }
+
+            .auth-form {
+                margin: 20px;
+                padding: 30px 20px;
+            }
+        }
+    </style>
 
         .tabs {
             display: flex;
@@ -270,198 +723,694 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🔐 AES Connect</h1>
-            <p>Chiffrement et déchiffrement sécurisé avec AES-256</p>
-        </div>
-
-        <div class="main-content">
-            <div class="tabs">
-                <button class="tab active" onclick="showTab('encrypt')">Chiffrer</button>
-                <button class="tab" onclick="showTab('decrypt')">Déchiffrer</button>
+    <!-- Header -->
+    <div class="header">
+        <h1>AESConnect</h1>
+        <div class="header-actions">
+            <div id="user-info" class="user-info hidden">
+                <div class="avatar" id="user-avatar">U</div>
+                <span id="user-name">Utilisateur</span>
+                <button onclick="logout()">Déconnexion</button>
             </div>
-
-            <!-- Encrypt Tab -->
-            <div id="encrypt-tab" class="tab-content active">
-                <form id="encrypt-form">
-                    <div class="form-group">
-                        <label for="encrypt-text">Texte à chiffrer :</label>
-                        <textarea id="encrypt-text" class="form-control" placeholder="Saisissez le texte à chiffrer..." required></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="encrypt-password">Mot de passe :</label>
-                        <input type="password" id="encrypt-password" class="form-control" placeholder="Mot de passe sécurisé" required>
-                    </div>
-                    <button type="submit" class="btn">🔒 Chiffrer</button>
-                </form>
-                <div class="loading" id="encrypt-loading">Chiffrement en cours...</div>
-                <div id="encrypt-result" class="result"></div>
-            </div>
-
-            <!-- Decrypt Tab -->
-            <div id="decrypt-tab" class="tab-content">
-                <form id="decrypt-form">
-                    <div class="form-group">
-                        <label for="decrypt-data">Données chiffrées :</label>
-                        <textarea id="decrypt-data" class="form-control" placeholder="Collez les données chiffrées ici..." required></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="decrypt-password">Mot de passe :</label>
-                        <input type="password" id="decrypt-password" class="form-control" placeholder="Mot de passe utilisé pour le chiffrement" required>
-                    </div>
-                    <button type="submit" class="btn">🔓 Déchiffrer</button>
-                </form>
-                <div class="loading" id="decrypt-loading">Déchiffrement en cours...</div>
-                <div id="decrypt-result" class="result"></div>
-            </div>
-
-            <div class="security-info">
-                <h3>🛡️ Informations de sécurité</h3>
-                <ul>
-                    <li>Chiffrement AES-256 en mode CBC</li>
-                    <li>Clé dérivée avec PBKDF2 (100,000 itérations)</li>
-                    <li>Salt et IV générés aléatoirement pour chaque chiffrement</li>
-                    <li>Vos données ne sont jamais stockées sur le serveur</li>
-                    <li>Utilisez un mot de passe fort et unique</li>
-                </ul>
+            <div id="auth-buttons">
+                <button onclick="showLogin()">Connexion</button>
+                <button onclick="showRegister()">S'inscrire</button>
             </div>
         </div>
     </div>
 
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-item active" onclick="showSection('feed')">
+                    <span>🏠</span> Accueil
+                </div>
+                <div class="sidebar-item" onclick="showSection('profile')">
+                    <span>👤</span> Profil
+                </div>
+                <div class="sidebar-item" onclick="showSection('messages')">
+                    <span>💬</span> Messages
+                </div>
+                <div class="sidebar-item" onclick="showSection('groups')">
+                    <span>👥</span> Groupes
+                </div>
+                <div class="sidebar-item" onclick="showSection('friends')">
+                    <span>👋</span> Amis
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Feed Section -->
+            <div id="feed-section">
+                <!-- Create Post -->
+                <div class="create-post">
+                    <textarea id="post-content" placeholder="Que pensez-vous ?"></textarea>
+                    <div class="post-actions">
+                        <div></div>
+                        <button class="btn" onclick="createPost()">Publier</button>
+                    </div>
+                </div>
+
+                <!-- Posts Feed -->
+                <div id="posts-feed">
+                    <div class="loading">Chargement des posts...</div>
+                </div>
+            </div>
+
+            <!-- Messages Section -->
+            <div id="messages-section" class="hidden">
+                <div class="panel-section">
+                    <h3>💬 Messages</h3>
+                    <div id="messages-list">
+                        <div class="loading">Chargement des messages...</div>
+                    </div>
+                    
+                    <!-- Send Message Form -->
+                    <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e4e6ea;">
+                        <h4>Envoyer un message</h4>
+                        <div class="form-group">
+                            <input type="text" id="search-users" class="form-control" placeholder="Rechercher un utilisateur...">
+                            <div id="users-search-results"></div>
+                        </div>
+                        <div class="form-group">
+                            <textarea id="message-content" class="form-control" placeholder="Votre message..."></textarea>
+                        </div>
+                        <button class="btn" onclick="sendMessage()">Envoyer</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Groups Section -->
+            <div id="groups-section" class="hidden">
+                <div class="panel-section">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h3>👥 Groupes</h3>
+                        <button class="btn" onclick="showCreateGroup()">Créer un groupe</button>
+                    </div>
+                    <div id="groups-list">
+                        <div class="loading">Chargement des groupes...</div>
+                    </div>
+                </div>
+
+                <!-- Create Group Form (Hidden initially) -->
+                <div id="create-group-form" class="panel-section hidden">
+                    <h3>Créer un nouveau groupe</h3>
+                    <div class="form-group">
+                        <label>Nom du groupe</label>
+                        <input type="text" id="group-name" class="form-control" placeholder="Nom du groupe">
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="group-description" class="form-control" placeholder="Description du groupe"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="group-private"> Groupe privé
+                        </label>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn" onclick="createGroup()">Créer</button>
+                        <button class="btn-outline" onclick="hideCreateGroup()">Annuler</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel -->
+        <div class="right-panel">
+            <!-- Friends -->
+            <div class="panel-section">
+                <h3>👋 Amis en ligne</h3>
+                <div id="online-friends">
+                    <p style="color: #65676b; font-size: 14px;">Aucun ami en ligne</p>
+                </div>
+            </div>
+
+            <!-- Suggested Groups -->
+            <div class="panel-section">
+                <h3>🔍 Groupes suggérés</h3>
+                <div id="suggested-groups">
+                    <p style="color: #65676b; font-size: 14px;">Aucun groupe suggéré</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Authentication Modal -->
+    <div id="auth-modal" class="auth-container hidden">
+        <!-- Login Form -->
+        <div id="login-form" class="auth-form">
+            <h2>Connexion</h2>
+            <form onsubmit="login(event)">
+                <div class="form-group">
+                    <label>Nom d'utilisateur ou Email</label>
+                    <input type="text" id="login-username" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Mot de passe</label>
+                    <input type="password" id="login-password" class="form-control" required>
+                </div>
+                <div class="auth-actions">
+                    <button type="submit" class="btn">Se connecter</button>
+                    <button type="button" class="btn-outline" onclick="hideAuth()">Annuler</button>
+                </div>
+                <p style="text-align: center; margin-top: 15px; color: #65676b;">
+                    Pas de compte ? <a href="#" onclick="showRegister()" style="color: #1877f2;">S'inscrire</a>
+                </p>
+            </form>
+        </div>
+
+        <!-- Register Form -->
+        <div id="register-form" class="auth-form hidden">
+            <h2>S'inscrire</h2>
+            <form onsubmit="register(event)">
+                <div class="form-group">
+                    <label>Nom complet</label>
+                    <input type="text" id="register-fullname" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Nom d'utilisateur</label>
+                    <input type="text" id="register-username" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="register-email" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Mot de passe</label>
+                    <input type="password" id="register-password" class="form-control" required minlength="6">
+                </div>
+                <div class="auth-actions">
+                    <button type="submit" class="btn btn-secondary">S'inscrire</button>
+                    <button type="button" class="btn-outline" onclick="hideAuth()">Annuler</button>
+                </div>
+                <p style="text-align: center; margin-top: 15px; color: #65676b;">
+                    Déjà un compte ? <a href="#" onclick="showLogin()" style="color: #1877f2;">Se connecter</a>
+                </p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Notifications -->
+    <div id="notification" class="notification"></div>
+
     <script>
-        function showTab(tabName) {
-            // Hide all tabs
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
+        // Global state
+        let currentUser = null;
+        let selectedReceiver = null;
+        let posts = [];
+        let groups = [];
+        let messages = [];
 
-            // Show selected tab
-            document.getElementById(tabName + '-tab').classList.add('active');
-            event.target.classList.add('active');
-
-            // Clear results
-            document.querySelectorAll('.result').forEach(result => {
-                result.style.display = 'none';
-            });
+        // Utility functions
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type} show`;
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
         }
 
-        function showLoading(type, show) {
-            const loadingEl = document.getElementById(type + '-loading');
-            loadingEl.style.display = show ? 'block' : 'none';
+        function formatTime(timestamp) {
+            const date = new Date(timestamp);
+            const now = new Date();
+            const diff = now - date;
+            
+            if (diff < 60000) return 'À l\'instant';
+            if (diff < 3600000) return `${Math.floor(diff / 60000)}min`;
+            if (diff < 86400000) return `${Math.floor(diff / 3600000)}h`;
+            return date.toLocaleDateString();
         }
 
-        function showResult(type, success, message, data = null) {
-            const resultEl = document.getElementById(type + '-result');
-            resultEl.className = `result ${success ? 'success' : 'error'}`;
-            
-            let html = `<strong>${message}</strong>`;
-            if (data) {
-                html += `
-                    <div class="result-text">${data}</div>
-                    <button class="copy-btn" onclick="copyToClipboard('${data.replace(/'/g, "\\'")}')">
-                        📋 Copier
-                    </button>
-                `;
-            }
-            
-            resultEl.innerHTML = html;
-            resultEl.style.display = 'block';
+        // Authentication functions
+        function showLogin() {
+            document.getElementById('auth-modal').classList.remove('hidden');
+            document.getElementById('login-form').classList.remove('hidden');
+            document.getElementById('register-form').classList.add('hidden');
         }
 
-        function copyToClipboard(text) {
-            navigator.clipboard.writeText(text).then(() => {
-                alert('Copié dans le presse-papiers !');
-            }).catch(err => {
-                console.error('Erreur de copie :', err);
-                // Fallback method
-                const textArea = document.createElement('textarea');
-                textArea.value = text;
-                document.body.appendChild(textArea);
-                textArea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textArea);
-                alert('Copié dans le presse-papiers !');
-            });
+        function showRegister() {
+            document.getElementById('auth-modal').classList.remove('hidden');
+            document.getElementById('register-form').classList.remove('hidden');
+            document.getElementById('login-form').classList.add('hidden');
         }
 
-        // Encrypt form handler
-        document.getElementById('encrypt-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
+        function hideAuth() {
+            document.getElementById('auth-modal').classList.add('hidden');
+        }
+
+        async function login(event) {
+            event.preventDefault();
             
-            const text = document.getElementById('encrypt-text').value;
-            const password = document.getElementById('encrypt-password').value;
-            
-            if (!text || !password) {
-                showResult('encrypt', false, 'Veuillez remplir tous les champs.');
-                return;
-            }
-            
-            showLoading('encrypt', true);
+            const username = document.getElementById('login-username').value;
+            const password = document.getElementById('login-password').value;
             
             try {
-                const response = await fetch('/encrypt', {
+                const response = await fetch('/login', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ text, password })
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ username, password })
                 });
                 
                 const result = await response.json();
                 
                 if (result.success) {
-                    showResult('encrypt', true, result.message, result.encrypted_data);
-                    document.getElementById('encrypt-form').reset();
+                    currentUser = result.user;
+                    updateUserInterface();
+                    hideAuth();
+                    showNotification(result.message);
+                    loadFeed();
                 } else {
-                    showResult('encrypt', false, result.error || 'Erreur lors du chiffrement');
+                    showNotification(result.error, 'error');
                 }
             } catch (error) {
-                showResult('encrypt', false, 'Erreur de connexion au serveur');
-            } finally {
-                showLoading('encrypt', false);
+                showNotification('Erreur de connexion', 'error');
             }
+        }
+
+        async function register(event) {
+            event.preventDefault();
+            
+            const full_name = document.getElementById('register-fullname').value;
+            const username = document.getElementById('register-username').value;
+            const email = document.getElementById('register-email').value;
+            const password = document.getElementById('register-password').value;
+            
+            try {
+                const response = await fetch('/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ username, email, password, full_name })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    currentUser = result.user;
+                    updateUserInterface();
+                    hideAuth();
+                    showNotification(result.message);
+                    loadFeed();
+                } else {
+                    showNotification(result.error, 'error');
+                }
+            } catch (error) {
+                showNotification('Erreur lors de l\'inscription', 'error');
+            }
+        }
+
+        async function logout() {
+            try {
+                await fetch('/logout', { 
+                    method: 'POST',
+                    credentials: 'include'
+                });
+                currentUser = null;
+                updateUserInterface();
+                showNotification('Déconnexion réussie');
+            } catch (error) {
+                showNotification('Erreur lors de la déconnexion', 'error');
+            }
+        }
+
+        function updateUserInterface() {
+            if (currentUser) {
+                document.getElementById('user-info').classList.remove('hidden');
+                document.getElementById('auth-buttons').classList.add('hidden');
+                document.getElementById('user-name').textContent = currentUser.full_name;
+                document.getElementById('user-avatar').textContent = currentUser.full_name[0].toUpperCase();
+            } else {
+                document.getElementById('user-info').classList.add('hidden');
+                document.getElementById('auth-buttons').classList.remove('hidden');
+            }
+        }
+
+        // Navigation
+        function showSection(section) {
+            // Hide all sections
+            document.querySelectorAll('.main-content > div').forEach(div => {
+                div.classList.add('hidden');
+            });
+            
+            // Show selected section
+            document.getElementById(section + '-section').classList.remove('hidden');
+            
+            // Update sidebar
+            document.querySelectorAll('.sidebar-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Load section data
+            switch(section) {
+                case 'feed':
+                    loadFeed();
+                    break;
+                case 'messages':
+                    loadMessages();
+                    break;
+                case 'groups':
+                    loadGroups();
+                    break;
+            }
+        }
+
+        // Posts functions
+        async function createPost() {
+            if (!currentUser) {
+                showLogin();
+                return;
+            }
+            
+            const content = document.getElementById('post-content').value.trim();
+            if (!content) {
+                showNotification('Veuillez saisir du contenu', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/posts', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ content })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    document.getElementById('post-content').value = '';
+                    showNotification('Post publié !');
+                    loadFeed();
+                } else {
+                    showNotification(result.error, 'error');
+                }
+            } catch (error) {
+                showNotification('Erreur lors de la publication', 'error');
+            }
+        }
+
+        async function loadFeed() {
+            if (!currentUser) return;
+            
+            try {
+                const response = await fetch('/posts', {
+                    credentials: 'include'
+                });
+                const result = await response.json();
+                
+                if (result.success) {
+                    posts = result.posts;
+                    renderPosts();
+                }
+            } catch (error) {
+                console.error('Erreur lors du chargement du feed:', error);
+            }
+        }
+
+        function renderPosts() {
+            const feedEl = document.getElementById('posts-feed');
+            
+            if (posts.length === 0) {
+                feedEl.innerHTML = '<div class="loading">Aucun post à afficher</div>';
+                return;
+            }
+            
+            feedEl.innerHTML = posts.map(post => `
+                <div class="post">
+                    <div class="post-header">
+                        <div class="avatar">${post.full_name[0].toUpperCase()}</div>
+                        <div class="post-author">
+                            <div class="post-author-name">${post.full_name}</div>
+                            <div class="post-time">${formatTime(post.created_at)}</div>
+                        </div>
+                    </div>
+                    <div class="post-content">${post.content}</div>
+                    <div class="post-actions-bar">
+                        <button class="post-action ${post.user_liked ? 'liked' : ''}" onclick="toggleLike(${post.id})">
+                            <span>${post.user_liked ? '❤️' : '🤍'}</span>
+                            ${post.likes_count} J'aime
+                        </button>
+                        <button class="post-action" onclick="showComments(${post.id})">
+                            <span>💬</span>
+                            ${post.comments_count} Commentaires
+                        </button>
+                        <button class="post-action">
+                            <span>📤</span>
+                            Partager
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function toggleLike(postId) {
+            try {
+                const response = await fetch(`/posts/${postId}/like`, {
+                    method: 'POST',
+                    credentials: 'include'
+                });
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Update local state
+                    const post = posts.find(p => p.id === postId);
+                    if (post) {
+                        post.user_liked = result.liked ? 1 : 0;
+                        post.likes_count = result.likes_count;
+                        renderPosts();
+                    }
+                }
+            } catch (error) {
+                showNotification('Erreur', 'error');
+            }
+        }
+
+        // Groups functions
+        async function loadGroups() {
+            if (!currentUser) return;
+            
+            try {
+                const response = await fetch('/groups', {
+                    credentials: 'include'
+                });
+                const result = await response.json();
+                
+                if (result.success) {
+                    groups = result.groups;
+                    renderGroups();
+                }
+            } catch (error) {
+                console.error('Erreur lors du chargement des groupes:', error);
+            }
+        }
+
+        function renderGroups() {
+            const groupsEl = document.getElementById('groups-list');
+            
+            if (groups.length === 0) {
+                groupsEl.innerHTML = '<div class="loading">Aucun groupe trouvé</div>';
+                return;
+            }
+            
+            groupsEl.innerHTML = groups.map(group => `
+                <div class="group-item">
+                    <div class="group-avatar">${group.name[0].toUpperCase()}</div>
+                    <div class="group-info">
+                        <h4>${group.name}</h4>
+                        <p>${group.members_count} membre${group.members_count > 1 ? 's' : ''}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function showCreateGroup() {
+            document.getElementById('create-group-form').classList.remove('hidden');
+        }
+
+        function hideCreateGroup() {
+            document.getElementById('create-group-form').classList.add('hidden');
+        }
+
+        async function createGroup() {
+            const name = document.getElementById('group-name').value.trim();
+            const description = document.getElementById('group-description').value.trim();
+            const is_private = document.getElementById('group-private').checked;
+            
+            if (!name) {
+                showNotification('Le nom du groupe est requis', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/groups', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ name, description, is_private })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    hideCreateGroup();
+                    showNotification('Groupe créé !');
+                    loadGroups();
+                    // Reset form
+                    document.getElementById('group-name').value = '';
+                    document.getElementById('group-description').value = '';
+                    document.getElementById('group-private').checked = false;
+                } else {
+                    showNotification(result.error, 'error');
+                }
+            } catch (error) {
+                showNotification('Erreur lors de la création', 'error');
+            }
+        }
+
+        // Messages functions
+        async function loadMessages() {
+            if (!currentUser) return;
+            
+            try {
+                const response = await fetch('/messages', {
+                    credentials: 'include'
+                });
+                const result = await response.json();
+                
+                if (result.success) {
+                    messages = result.messages;
+                    renderMessages();
+                }
+            } catch (error) {
+                console.error('Erreur lors du chargement des messages:', error);
+            }
+        }
+
+        function renderMessages() {
+            const messagesEl = document.getElementById('messages-list');
+            
+            if (messages.length === 0) {
+                messagesEl.innerHTML = '<div class="loading">Aucun message</div>';
+                return;
+            }
+            
+            messagesEl.innerHTML = messages.map(message => `
+                <div class="message-item ${!message.is_read ? 'unread' : ''}">
+                    <div class="avatar">${(message.sender_name || 'U')[0].toUpperCase()}</div>
+                    <div class="message-info">
+                        <h4>${message.sender_id === currentUser.id ? `À ${message.receiver_name}` : `De ${message.sender_name}`}</h4>
+                        <div class="message-preview">${message.content}</div>
+                        <div class="post-time">${formatTime(message.created_at)}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // User search for messages
+        let searchTimeout;
+        document.getElementById('search-users').addEventListener('input', function(e) {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                searchUsers(e.target.value);
+            }, 300);
         });
 
-        // Decrypt form handler
-        document.getElementById('decrypt-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const encrypted_data = document.getElementById('decrypt-data').value;
-            const password = document.getElementById('decrypt-password').value;
-            
-            if (!encrypted_data || !password) {
-                showResult('decrypt', false, 'Veuillez remplir tous les champs.');
+        async function searchUsers(query) {
+            if (!query.trim()) {
+                document.getElementById('users-search-results').innerHTML = '';
                 return;
             }
             
-            showLoading('decrypt', true);
+            try {
+                const response = await fetch(`/users/search?q=${encodeURIComponent(query)}`, {
+                    credentials: 'include'
+                });
+                const result = await response.json();
+                
+                if (result.success && result.users.length > 0) {
+                    document.getElementById('users-search-results').innerHTML = result.users.map(user => `
+                        <div class="group-item" onclick="selectReceiver(${user.id}, '${user.full_name}')">
+                            <div class="avatar">${user.full_name[0].toUpperCase()}</div>
+                            <div class="group-info">
+                                <h4>${user.full_name}</h4>
+                                <p>@${user.username}</p>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    document.getElementById('users-search-results').innerHTML = '<p style="padding: 10px; color: #65676b;">Aucun utilisateur trouvé</p>';
+                }
+            } catch (error) {
+                console.error('Erreur de recherche:', error);
+            }
+        }
+
+        function selectReceiver(userId, userName) {
+            selectedReceiver = userId;
+            document.getElementById('search-users').value = userName;
+            document.getElementById('users-search-results').innerHTML = '';
+        }
+
+        async function sendMessage() {
+            if (!selectedReceiver) {
+                showNotification('Veuillez sélectionner un destinataire', 'error');
+                return;
+            }
+            
+            const content = document.getElementById('message-content').value.trim();
+            if (!content) {
+                showNotification('Veuillez saisir un message', 'error');
+                return;
+            }
             
             try {
-                const response = await fetch('/decrypt', {
+                const response = await fetch('/messages', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ encrypted_data, password })
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ receiver_id: selectedReceiver, content })
                 });
                 
                 const result = await response.json();
                 
                 if (result.success) {
-                    showResult('decrypt', true, result.message, result.decrypted_text);
-                    document.getElementById('decrypt-form').reset();
+                    document.getElementById('message-content').value = '';
+                    document.getElementById('search-users').value = '';
+                    selectedReceiver = null;
+                    showNotification('Message envoyé !');
+                    loadMessages();
                 } else {
-                    showResult('decrypt', false, result.error || 'Erreur lors du déchiffrement');
+                    showNotification(result.error, 'error');
                 }
             } catch (error) {
-                showResult('decrypt', false, 'Erreur de connexion au serveur');
-            } finally {
-                showLoading('decrypt', false);
+                showNotification('Erreur lors de l\'envoi', 'error');
             }
+        }
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if user is already logged in (session exists)
+            fetch('/profile', { credentials: 'include' })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success) {
+                        currentUser = result.user;
+                        updateUserInterface();
+                        loadFeed();
+                    }
+                })
+                .catch(() => {
+                    // User not logged in, show auth
+                });
         });
     </script>
 </body>
