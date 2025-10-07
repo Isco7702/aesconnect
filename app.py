@@ -10,10 +10,22 @@ app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', secrets.token_hex(32))
 CORS(app, supports_credentials=True)
 
+# Database configuration
+DATABASE_PATH = os.environ.get('DATABASE_PATH', 
+    '/opt/render/project/src/social_network.db' if os.environ.get('RENDER') else './social_network.db')
+
 # Database initialization
 def init_db():
     """Initialize SQLite database with all required tables"""
-    conn = sqlite3.connect('social_network.db')
+    # Ensure directory exists
+    db_dir = os.path.dirname(DATABASE_PATH)
+    if db_dir and not os.path.exists(db_dir):
+        try:
+            os.makedirs(db_dir, exist_ok=True)
+        except PermissionError as e:
+            print(f"Warning: Cannot create directory {db_dir}: {e}")
+    
+    conn = sqlite3.connect(DATABASE_PATH)
     cursor = conn.cursor()
     
     # Users table
@@ -132,7 +144,7 @@ def init_db():
 
 def get_db_connection():
     """Get database connection"""
-    conn = sqlite3.connect('social_network.db')
+    conn = sqlite3.connect(DATABASE_PATH)
     conn.row_factory = sqlite3.Row
     return conn
 
@@ -144,6 +156,30 @@ def require_login(f):
         return f(*args, **kwargs)
     decorated_function.__name__ = f.__name__
     return decorated_function
+
+# Initialize database on startup
+try:
+    init_db()
+    print("Database initialized successfully")
+    
+    # Verify tables exist
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
+    tables = cursor.fetchall()
+    table_names = [table[0] for table in tables]
+    print(f"Tables created: {table_names}")
+    
+    # Check if users table exists and has expected structure
+    cursor.execute("PRAGMA table_info(users);")
+    columns = cursor.fetchall()
+    print(f"Users table columns: {[col[1] for col in columns]}")
+    conn.close()
+    
+except Exception as e:
+    print(f"Warning: Database initialization failed: {e}")
+    import traceback
+    traceback.print_exc()
 
 # Routes
 @app.route('/')
@@ -577,10 +613,35 @@ def search_users():
 @app.route('/health', methods=['GET'])
 def health_check():
     """Health check endpoint"""
+    try:
+        # Test database connection
+        conn = get_db_connection()
+        conn.execute('SELECT 1')
+        conn.close()
+        db_status = 'connected'
+    except Exception as e:
+        db_status = f'error: {str(e)}'
+    
     return jsonify({
         'status': 'healthy',
-        'service': 'Social Network API'
+        'service': 'Social Network API',
+        'database': db_status
     })
+
+@app.route('/init-db', methods=['POST'])
+def init_database():
+    """Initialize database manually"""
+    try:
+        init_db()
+        return jsonify({
+            'success': True,
+            'message': 'Database initialized successfully'
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': f'Database initialization failed: {str(e)}'
+        }), 500
 
 if __name__ == '__main__':
     init_db()  # Initialize database on startup
