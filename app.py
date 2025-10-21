@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, render_template, session, redirect, url_for
+from flask import Flask, request, jsonify, render_template, session, redirect, url_for, send_from_directory
 from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta
@@ -6,7 +6,7 @@ import sqlite3
 import os
 import secrets
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static', static_url_path='/static')
 app.secret_key = os.environ.get('SECRET_KEY', secrets.token_hex(32))
 CORS(app, supports_credentials=True)
 
@@ -38,6 +38,8 @@ def init_db():
             full_name TEXT NOT NULL,
             bio TEXT DEFAULT '',
             avatar_url TEXT DEFAULT '',
+            country TEXT DEFAULT '',
+            city TEXT DEFAULT '',
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             is_active BOOLEAN DEFAULT 1
         )
@@ -139,6 +141,22 @@ def init_db():
         )
     ''')
     
+    # Reports table for moderation
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS reports (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            reporter_id INTEGER NOT NULL,
+            reported_user_id INTEGER,
+            reported_post_id INTEGER,
+            reason TEXT NOT NULL,
+            status TEXT DEFAULT 'pending',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (reporter_id) REFERENCES users (id),
+            FOREIGN KEY (reported_user_id) REFERENCES users (id),
+            FOREIGN KEY (reported_post_id) REFERENCES posts (id)
+        )
+    ''')
+    
     conn.commit()
     conn.close()
 
@@ -184,8 +202,29 @@ except Exception as e:
 # Routes
 @app.route('/')
 def index():
-    """Serve the main page"""
+    """Serve the main page - landing or app"""
+    # Check if user is logged in
+    if 'user_id' in session:
+        return render_template('index.html')
+    else:
+        return render_template('landing.html')
+
+@app.route('/app')
+def app_page():
+    """Serve the app page for logged in users"""
+    if 'user_id' not in session:
+        return redirect(url_for('index'))
     return render_template('index.html')
+
+@app.route('/favicon.ico')
+def favicon():
+    """Serve favicon"""
+    return send_from_directory(os.path.join(app.root_path, 'static'), 'favicon.svg', mimetype='image/svg+xml')
+
+@app.route('/manifest.json')
+def manifest():
+    """Serve PWA manifest"""
+    return send_from_directory(os.path.join(app.root_path, 'static'), 'manifest.json', mimetype='application/json')
 
 # Authentication routes
 @app.route('/register', methods=['POST'])
@@ -197,9 +236,12 @@ def register():
         email = data.get('email', '').strip()
         password = data.get('password', '')
         full_name = data.get('full_name', '').strip()
+        country = data.get('country', '').strip()
+        city = data.get('city', '').strip()
+        avatar_url = data.get('avatar_url', '').strip()
         
         if not all([username, email, password, full_name]):
-            return jsonify({'success': False, 'error': 'Tous les champs sont requis'}), 400
+            return jsonify({'success': False, 'error': 'Tous les champs obligatoires sont requis'}), 400
         
         if len(password) < 6:
             return jsonify({'success': False, 'error': 'Le mot de passe doit contenir au moins 6 caractères'}), 400
@@ -219,8 +261,8 @@ def register():
         # Create new user
         password_hash = generate_password_hash(password)
         cursor = conn.execute(
-            'INSERT INTO users (username, email, password_hash, full_name) VALUES (?, ?, ?, ?)',
-            (username, email, password_hash, full_name)
+            'INSERT INTO users (username, email, password_hash, full_name, country, city, avatar_url) VALUES (?, ?, ?, ?, ?, ?, ?)',
+            (username, email, password_hash, full_name, country, city, avatar_url)
         )
         user_id = cursor.lastrowid
         conn.commit()
@@ -233,7 +275,7 @@ def register():
         return jsonify({
             'success': True,
             'message': 'Compte créé avec succès',
-            'user': {'id': user_id, 'username': username, 'full_name': full_name}
+            'user': {'id': user_id, 'username': username, 'full_name': full_name, 'country': country, 'city': city}
         })
     
     except Exception as e:
@@ -607,6 +649,50 @@ def search_users():
             'users': [dict(user) for user in users]
         })
     
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/report', methods=['POST'])
+@require_login
+def report_content():
+    """Report inappropriate content or user"""
+    try:
+        data = request.get_json()
+        reported_user_id = data.get('reported_user_id')
+        reported_post_id = data.get('reported_post_id')
+        reason = data.get('reason', '').strip()
+        
+        if not reason:
+            return jsonify({'success': False, 'error': 'Raison du signalement requise'}), 400
+        
+        if not reported_user_id and not reported_post_id:
+            return jsonify({'success': False, 'error': 'Vous devez signaler un utilisateur ou un post'}), 400
+        
+        conn = get_db_connection()
+        cursor = conn.execute(
+            'INSERT INTO reports (reporter_id, reported_user_id, reported_post_id, reason) VALUES (?, ?, ?, ?)',
+            (session['user_id'], reported_user_id, reported_post_id, reason)
+        )
+        report_id = cursor.lastrowid
+        conn.commit()
+        conn.close()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Signalement envoyé à la modération',
+            'report_id': report_id
+        })
+    
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/charter')
+def get_charter():
+    """Get the charter document"""
+    try:
+        with open('CHARTE_UTILISATION.md', 'r', encoding='utf-8') as f:
+            content = f.read()
+        return jsonify({'success': True, 'content': content})
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
 

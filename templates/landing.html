@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AESConnect - Le réseau social des jeunes d'Afrique de l'Est. Connecte-toi, partage, inspire !">
+    <meta name="theme-color" content="#22c55e">
+    <title>AESConnect - Réseau Social Afrique de l'Est</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/static/manifest.json">
+    
+    <!-- Apple Touch Icon -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="/static/styles.css">
+    
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="loading-screen">
+        <img src="/static/logo.svg" alt="AESConnect" class="loading-logo">
+        <div class="loading-text">AESConnect</div>
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Landing Page -->
+    <div class="landing-page">
+        <div class="landing-container">
+            <!-- Hero Section -->
+            <div class="landing-hero">
+                <img src="/static/logo.svg" alt="AESConnect Logo" class="landing-logo">
+                <h1 class="landing-title">Bienvenue sur AESConnect</h1>
+                <p class="landing-subtitle">Le réseau social de l'Afrique de l'Est 🌍</p>
+                <p class="landing-description">
+                    Connecte-toi avec des milliers de jeunes passionnés du Kenya, Uganda, Tanzania, Rwanda et Ethiopia. 
+                    Partage tes idées, découvre de nouvelles opportunités et construis ton réseau professionnel.
+                </p>
+                
+                <!-- Features -->
+                <div class="landing-features">
+                    <div class="feature-item">
+                        <span class="feature-icon">👥</span>
+                        <span>Réseau authentique</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">💼</span>
+                        <span>Opportunités pros</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">📱</span>
+                        <span>Mobile & Desktop</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">🔒</span>
+                        <span>Sécurisé & Privé</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">💬</span>
+                        <span>Messagerie instantanée</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">👥</span>
+                        <span>Groupes thématiques</span>
+                    </div>
+                </div>
+                
+                <!-- CTA Buttons -->
+                <div class="landing-cta">
+                    <button class="cta-button cta-primary" onclick="document.querySelector('.auth-tab[onclick*=register]').click()">
+                        Créer un compte gratuitement
+                    </button>
+                    <button class="cta-button cta-secondary" onclick="AESConnect.showCharter()">
+                        📜 Voir la charte
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Auth Card -->
+            <div class="landing-auth-card">
+                <!-- Auth Tabs -->
+                <div class="auth-tabs">
+                    <button class="auth-tab active" onclick="AESConnect.switchAuthTab('register')">
+                        S'inscrire
+                    </button>
+                    <button class="auth-tab" onclick="AESConnect.switchAuthTab('login')">
+                        Se connecter
+                    </button>
+                </div>
+                
+                <!-- Register Form -->
+                <form id="register-form" class="auth-form active" onsubmit="AESConnect.handleRegister(event)">
+                    <div class="form-group">
+                        <label class="form-label">Nom d'utilisateur *</label>
+                        <input type="text" id="register-username" class="form-input" 
+                               placeholder="ex: amina_kenya" required 
+                               pattern="[a-zA-Z0-9_]{3,20}"
+                               title="3-20 caractères, lettres, chiffres et _ uniquement">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Email *</label>
+                        <input type="email" id="register-email" class="form-input" 
+                               placeholder="votre@email.com" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Nom complet *</label>
+                        <input type="text" id="register-fullname" class="form-input" 
+                               placeholder="ex: Amina Wanjiru" required>
+                    </div>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Pays *</label>
+                            <select id="register-country" class="form-select" required>
+                                <option value="">Sélectionner...</option>
+                                <option value="Kenya">🇰🇪 Kenya</option>
+                                <option value="Uganda">🇺🇬 Uganda</option>
+                                <option value="Tanzania">🇹🇿 Tanzania</option>
+                                <option value="Rwanda">🇷🇼 Rwanda</option>
+                                <option value="Ethiopia">🇪🇹 Ethiopia</option>
+                                <option value="Burundi">🇧🇮 Burundi</option>
+                                <option value="South Sudan">🇸🇸 South Sudan</option>
+                                <option value="Autre">🌍 Autre</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Ville</label>
+                            <input type="text" id="register-city" class="form-input" 
+                                   placeholder="ex: Nairobi">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Mot de passe * (min. 6 caractères)</label>
+                        <input type="password" id="register-password" class="form-input" 
+                               placeholder="••••••••" required minlength="6">
+                    </div>
+                    
+                    <button type="submit" class="submit-button">
+                        Créer mon compte 🚀
+                    </button>
+                    
+                    <div class="form-footer">
+                        En vous inscrivant, vous acceptez notre 
+                        <a href="#" onclick="AESConnect.showCharter(); return false;">Charte d'utilisation</a>
+                    </div>
+                </form>
+                
+                <!-- Login Form -->
+                <form id="login-form" class="auth-form" onsubmit="AESConnect.handleLogin(event)">
+                    <div class="form-group">
+                        <label class="form-label">Nom d'utilisateur ou Email</label>
+                        <input type="text" id="login-username" class="form-input" 
+                               placeholder="votre_username ou email" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Mot de passe</label>
+                        <input type="password" id="login-password" class="form-input" 
+                               placeholder="••••••••" required>
+                    </div>
+                    
+                    <button type="submit" class="submit-button">
+                        Se connecter 🔐
+                    </button>
+                    
+                    <div class="form-footer">
+                        <p>Comptes de démonstration :</p>
+                        <p><strong>amina_kenya</strong> / demo123</p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Charter Modal -->
+    <div id="charter-modal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close" onclick="AESConnect.hideCharter()">×</button>
+            <h2 class="modal-title">📜 Charte d'Utilisation AESConnect</h2>
+            <div class="modal-body">
+                <h3>🤝 Nos Valeurs</h3>
+                <p>AESConnect est dédié à créer un espace sûr et respectueux pour tous.</p>
+                
+                <h3>✅ Comportements Encouragés</h3>
+                <ul>
+                    <li>Partager du contenu authentique et positif</li>
+                    <li>Respecter tous les membres de la communauté</li>
+                    <li>Encourager et soutenir les autres</li>
+                    <li>Célébrer la diversité de l'Afrique de l'Est</li>
+                </ul>
+                
+                <h3>❌ Strictement Interdit</h3>
+                <ul>
+                    <li>Harcèlement ou intimidation</li>
+                    <li>Contenu inapproprié ou offensant</li>
+                    <li>Spam ou fraude</li>
+                    <li>Usurpation d'identité</li>
+                    <li>Discours de haine ou discrimination</li>
+                </ul>
+                
+                <h3>🛡️ Modération</h3>
+                <p>Notre équipe examine tous les signalements dans les 24 heures. Les violations peuvent entraîner des avertissements, suspensions ou bannissements.</p>
+                
+                <h3>📞 Contact</h3>
+                <p>
+                    <strong>Modération :</strong> moderation@aesconnect.com<br>
+                    <strong>Support :</strong> support@aesconnect.com
+                </p>
+                
+                <p style="margin-top: 20px; padding-top: 20px; border-top: 2px solid #e5e7eb;">
+                    <a href="/CHARTE_UTILISATION.md" target="_blank" style="color: #22c55e; text-decoration: none; font-weight: bold;">
+                        📄 Lire la charte complète →
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- PWA Install Banner -->
+    <div id="pwa-install-banner" class="pwa-install-banner">
+        <img src="/static/logo.svg" alt="AESConnect" class="pwa-icon">
+        <div class="pwa-content">
+            <div class="pwa-title">Installer AESConnect</div>
+            <div class="pwa-text">Accédez rapidement à AESConnect depuis votre écran d'accueil</div>
+        </div>
+        <div class="pwa-buttons">
+            <button class="pwa-button pwa-install" onclick="AESConnect.installPWA()">
+                Installer
+            </button>
+            <button class="pwa-button pwa-dismiss" onclick="AESConnect.dismissPWABanner()">
+                Plus tard
+            </button>
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="/static/app.js"></script>
+</body>
+</html>
