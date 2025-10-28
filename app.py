@@ -5,6 +5,8 @@ from datetime import datetime, timedelta
 import sqlite3
 import os
 import secrets
+import html
+import re
 
 app = Flask(__name__, static_folder='static', static_url_path='/static')
 app.secret_key = os.environ.get('SECRET_KEY', secrets.token_hex(32))
@@ -175,6 +177,30 @@ def require_login(f):
     decorated_function.__name__ = f.__name__
     return decorated_function
 
+def sanitize_html(text):
+    """Sanitize HTML to prevent XSS attacks"""
+    if not text:
+        return text
+    # Escape HTML characters
+    text = html.escape(text)
+    return text
+
+def validate_text_length(text, min_len=1, max_len=5000):
+    """Validate text length"""
+    if not text or len(text.strip()) < min_len:
+        return False, f'Le texte doit contenir au moins {min_len} caractère(s)'
+    if len(text) > max_len:
+        return False, f'Le texte ne peut pas dépasser {max_len} caractères'
+    return True, None
+
+def is_safe_url(url):
+    """Check if URL is safe"""
+    if not url:
+        return True
+    # Only allow http and https protocols
+    allowed_protocols = ['http://', 'https://']
+    return any(url.startswith(protocol) for protocol in allowed_protocols)
+
 # Initialize database on startup
 try:
     init_db()
@@ -331,20 +357,82 @@ def logout():
 def get_profile():
     """Get user profile"""
     try:
+        user_id = request.args.get('user_id', session['user_id'])
+        
         conn = get_db_connection()
         user = conn.execute(
-            'SELECT id, username, email, full_name, bio, avatar_url, created_at FROM users WHERE id = ?',
-            (session['user_id'],)
+            'SELECT id, username, email, full_name, bio, avatar_url, country, city, created_at FROM users WHERE id = ?',
+            (user_id,)
         ).fetchone()
+        
+        if not user:
+            conn.close()
+            return jsonify({'success': False, 'error': 'Utilisateur non trouvé'}), 404
+        
+        # Get user stats
+        posts_count = conn.execute('SELECT COUNT(*) as count FROM posts WHERE user_id = ?', (user_id,)).fetchone()['count']
+        
+        followers_count = conn.execute('''
+            SELECT COUNT(*) as count FROM friendships 
+            WHERE user2_id = ? AND status = 'accepted'
+        ''', (user_id,)).fetchone()['count']
+        
+        following_count = conn.execute('''
+            SELECT COUNT(*) as count FROM friendships 
+            WHERE user1_id = ? AND status = 'accepted'
+        ''', (user_id,)).fetchone()['count']
+        
         conn.close()
         
-        if user:
-            return jsonify({
-                'success': True,
-                'user': dict(user)
-            })
-        else:
-            return jsonify({'success': False, 'error': 'Utilisateur non trouvé'}), 404
+        user_data = dict(user)
+        user_data['posts_count'] = posts_count
+        user_data['followers_count'] = followers_count
+        user_data['following_count'] = following_count
+        user_data['is_own_profile'] = (int(user_id) == session['user_id'])
+        
+        return jsonify({
+            'success': True,
+            'user': user_data
+        })
+    
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/profile', methods=['PUT'])
+@require_login
+def update_profile():
+    """Update user profile"""
+    try:
+        data = request.get_json()
+        
+        # Champs autorisés à être modifiés
+        allowed_fields = ['full_name', 'bio', 'avatar_url', 'country', 'city']
+        updates = {}
+        
+        for field in allowed_fields:
+            if field in data:
+                updates[field] = data[field]
+        
+        if not updates:
+            return jsonify({'success': False, 'error': 'Aucune donnée à mettre à jour'}), 400
+        
+        # Construire la requête SQL dynamiquement
+        set_clause = ', '.join([f'{field} = ?' for field in updates.keys()])
+        values = list(updates.values())
+        values.append(session['user_id'])
+        
+        conn = get_db_connection()
+        conn.execute(
+            f'UPDATE users SET {set_clause} WHERE id = ?',
+            values
+        )
+        conn.commit()
+        conn.close()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Profil mis à jour avec succès'
+        })
     
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
@@ -383,14 +471,24 @@ def create_post():
     try:
         data = request.get_json()
         content = data.get('content', '').strip()
+        image_url = data.get('image_url', '').strip()
         
-        if not content:
-            return jsonify({'success': False, 'error': 'Le contenu est requis'}), 400
+        # Validate content
+        is_valid, error_msg = validate_text_length(content, min_len=1, max_len=5000)
+        if not is_valid:
+            return jsonify({'success': False, 'error': error_msg}), 400
+        
+        # Sanitize content to prevent XSS
+        content = sanitize_html(content)
+        
+        # Validate image URL if provided
+        if image_url and not is_safe_url(image_url):
+            return jsonify({'success': False, 'error': 'URL d\'image invalide'}), 400
         
         conn = get_db_connection()
         cursor = conn.execute(
-            'INSERT INTO posts (user_id, content) VALUES (?, ?)',
-            (session['user_id'], content)
+            'INSERT INTO posts (user_id, content, image_url) VALUES (?, ?, ?)',
+            (session['user_id'], content, image_url)
         )
         post_id = cursor.lastrowid
         conn.commit()
@@ -483,8 +581,13 @@ def add_comment(post_id):
         data = request.get_json()
         content = data.get('content', '').strip()
         
-        if not content:
-            return jsonify({'success': False, 'error': 'Le contenu du commentaire est requis'}), 400
+        # Validate content
+        is_valid, error_msg = validate_text_length(content, min_len=1, max_len=1000)
+        if not is_valid:
+            return jsonify({'success': False, 'error': error_msg}), 400
+        
+        # Sanitize content to prevent XSS
+        content = sanitize_html(content)
         
         conn = get_db_connection()
         cursor = conn.execute(
@@ -636,18 +739,84 @@ def search_users():
         
         conn = get_db_connection()
         users = conn.execute('''
-            SELECT id, username, full_name, avatar_url
+            SELECT id, username, full_name, avatar_url, country, city
             FROM users
-            WHERE username LIKE ? OR full_name LIKE ?
+            WHERE (username LIKE ? OR full_name LIKE ? OR country LIKE ? OR city LIKE ?)
             AND id != ?
             LIMIT 20
-        ''', (f'%{query}%', f'%{query}%', session['user_id'])).fetchall()
+        ''', (f'%{query}%', f'%{query}%', f'%{query}%', f'%{query}%', session['user_id'])).fetchall()
         conn.close()
         
         return jsonify({
             'success': True,
             'users': [dict(user) for user in users]
         })
+    
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/search', methods=['GET'])
+@require_login
+def global_search():
+    """Global search for users, posts, and groups"""
+    try:
+        query = request.args.get('q', '').strip()
+        search_type = request.args.get('type', 'all')
+        
+        if not query:
+            return jsonify({
+                'success': True,
+                'users': [],
+                'posts': [],
+                'groups': []
+            })
+        
+        conn = get_db_connection()
+        results = {
+            'success': True,
+            'users': [],
+            'posts': [],
+            'groups': []
+        }
+        
+        # Search users
+        if search_type in ['all', 'users']:
+            users = conn.execute('''
+                SELECT id, username, full_name, avatar_url, country, city, bio
+                FROM users
+                WHERE (username LIKE ? OR full_name LIKE ? OR country LIKE ? OR city LIKE ?)
+                AND id != ?
+                LIMIT 10
+            ''', (f'%{query}%', f'%{query}%', f'%{query}%', f'%{query}%', session['user_id'])).fetchall()
+            results['users'] = [dict(user) for user in users]
+        
+        # Search posts
+        if search_type in ['all', 'posts']:
+            posts = conn.execute('''
+                SELECT p.*, u.username, u.full_name, u.avatar_url
+                FROM posts p
+                JOIN users u ON p.user_id = u.id
+                WHERE p.content LIKE ?
+                ORDER BY p.created_at DESC
+                LIMIT 10
+            ''', (f'%{query}%',)).fetchall()
+            results['posts'] = [dict(post) for post in posts]
+        
+        # Search groups
+        if search_type in ['all', 'groups']:
+            groups = conn.execute('''
+                SELECT g.*, u.username as creator_username,
+                       (SELECT COUNT(*) FROM group_members WHERE group_id = g.id) as members_count
+                FROM groups g
+                JOIN users u ON g.creator_id = u.id
+                WHERE g.name LIKE ? OR g.description LIKE ?
+                LIMIT 10
+            ''', (f'%{query}%', f'%{query}%')).fetchall()
+            results['groups'] = [dict(group) for group in groups]
+        
+        conn.close()
+        
+        return jsonify(results)
     
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
@@ -728,6 +897,127 @@ def init_database():
             'success': False,
             'error': f'Database initialization failed: {str(e)}'
         }), 500
+
+@app.route('/users/<int:user_id>/block', methods=['POST'])
+@require_login
+def block_user(user_id):
+    """Block a user"""
+    try:
+        if user_id == session['user_id']:
+            return jsonify({'success': False, 'error': 'Vous ne pouvez pas vous bloquer vous-même'}), 400
+        
+        conn = get_db_connection()
+        
+        # Check if already blocked
+        existing = conn.execute('''
+            SELECT id FROM friendships 
+            WHERE user1_id = ? AND user2_id = ? AND status = 'blocked'
+        ''', (session['user_id'], user_id)).fetchone()
+        
+        if existing:
+            conn.close()
+            return jsonify({'success': False, 'error': 'Utilisateur déjà bloqué'}), 400
+        
+        # Delete existing friendship if any
+        conn.execute('''
+            DELETE FROM friendships 
+            WHERE (user1_id = ? AND user2_id = ?) OR (user1_id = ? AND user2_id = ?)
+        ''', (session['user_id'], user_id, user_id, session['user_id']))
+        
+        # Add block record
+        conn.execute('''
+            INSERT INTO friendships (user1_id, user2_id, status) 
+            VALUES (?, ?, 'blocked')
+        ''', (session['user_id'], user_id))
+        
+        conn.commit()
+        conn.close()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Utilisateur bloqué avec succès'
+        })
+    
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/users/<int:user_id>/unblock', methods=['POST'])
+@require_login
+def unblock_user(user_id):
+    """Unblock a user"""
+    try:
+        conn = get_db_connection()
+        
+        conn.execute('''
+            DELETE FROM friendships 
+            WHERE user1_id = ? AND user2_id = ? AND status = 'blocked'
+        ''', (session['user_id'], user_id))
+        
+        conn.commit()
+        conn.close()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Utilisateur débloqué avec succès'
+        })
+    
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/users/<int:user_id>/follow', methods=['POST'])
+@require_login
+def follow_user(user_id):
+    """Follow/Unfollow a user"""
+    try:
+        if user_id == session['user_id']:
+            return jsonify({'success': False, 'error': 'Vous ne pouvez pas vous suivre vous-même'}), 400
+        
+        conn = get_db_connection()
+        
+        # Check if already following
+        existing = conn.execute('''
+            SELECT id, status FROM friendships 
+            WHERE user1_id = ? AND user2_id = ?
+        ''', (session['user_id'], user_id)).fetchone()
+        
+        if existing:
+            if existing['status'] == 'accepted':
+                # Unfollow
+                conn.execute('''
+                    DELETE FROM friendships 
+                    WHERE user1_id = ? AND user2_id = ?
+                ''', (session['user_id'], user_id))
+                conn.commit()
+                conn.close()
+                return jsonify({
+                    'success': True,
+                    'following': False,
+                    'message': 'Vous ne suivez plus cet utilisateur'
+                })
+        
+        # Follow
+        if existing:
+            conn.execute('''
+                UPDATE friendships SET status = 'accepted'
+                WHERE user1_id = ? AND user2_id = ?
+            ''', (session['user_id'], user_id))
+        else:
+            conn.execute('''
+                INSERT INTO friendships (user1_id, user2_id, status) 
+                VALUES (?, ?, 'accepted')
+            ''', (session['user_id'], user_id))
+        
+        conn.commit()
+        conn.close()
+        
+        return jsonify({
+            'success': True,
+            'following': True,
+            'message': 'Vous suivez maintenant cet utilisateur'
+        })
+    
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 if __name__ == '__main__':
     init_db()  # Initialize database on startup
