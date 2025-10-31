@@ -4,23 +4,26 @@ Script pour ajouter du contenu de démonstration à AESConnect
 Cela évite l'effet "ville fantôme" lors du premier lancement
 """
 
-import sqlite3
 from werkzeug.security import generate_password_hash
 from datetime import datetime, timedelta
 import random
+import os
+import sys
+from flask import Flask
+from .database import DATABASE_PATH
+from .models import db, User, Post, Comment, Like, Group, GroupMember
 
-DATABASE_PATH = './social_network.db'
+# Ajouter le répertoire courant au path
+sys.path.insert(0, os.path.dirname(__file__))
 
-def get_db_connection():
-    conn = sqlite3.connect(DATABASE_PATH)
-    conn.row_factory = sqlite3.Row
-    return conn
+# Configuration temporaire de l'application Flask pour le contexte
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DATABASE_PATH}'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db.init_app(app)
 
 def seed_demo_users():
     """Créer des utilisateurs de démonstration"""
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    
     demo_users = [
         {
             'username': 'amina_kenya',
@@ -69,34 +72,36 @@ def seed_demo_users():
         }
     ]
     
-    password_hash = generate_password_hash('demo123')
     user_ids = []
     
-    for user in demo_users:
-        try:
-            cursor.execute('''
-                INSERT INTO users (username, email, password_hash, full_name, bio, country, city, avatar_url)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            ''', (user['username'], user['email'], password_hash, user['full_name'], 
-                  user['bio'], user['country'], user['city'], user['avatar_url']))
-            user_ids.append(cursor.lastrowid)
-        except sqlite3.IntegrityError:
-            print(f"Utilisateur {user['username']} existe déjà")
-            # Get existing user id
-            existing = cursor.execute('SELECT id FROM users WHERE username = ?', (user['username'],)).fetchone()
-            if existing:
-                user_ids.append(existing[0])
+    for user_data in demo_users:
+        existing_user = User.query.filter_by(username=user_data['username']).first()
+        
+        if existing_user:
+            print(f"Utilisateur {user_data['username']} existe déjà")
+            user_ids.append(existing_user.id)
+            continue
+        
+        new_user = User(
+            username=user_data['username'],
+            email=user_data['email'],
+            full_name=user_data['full_name'],
+            bio=user_data['bio'],
+            country=user_data['country'],
+            city=user_data['city'],
+            avatar_url=user_data['avatar_url']
+        )
+        new_user.set_password('demo123')
+        db.session.add(new_user)
+        db.session.flush()
+        user_ids.append(new_user.id)
     
-    conn.commit()
-    conn.close()
+    db.session.commit()
     print(f"✅ {len(user_ids)} utilisateurs de démonstration créés/vérifiés")
     return user_ids
 
 def seed_demo_posts(user_ids):
     """Créer des posts de démonstration"""
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    
     demo_posts = [
         {
             'content': '🎉 Bienvenue sur AESConnect ! Notre réseau social dédié à l\'Afrique de l\'Est. Connectons-nous et bâtissons ensemble ! #AESConnect #EastAfrica',
@@ -133,24 +138,22 @@ def seed_demo_posts(user_ids):
     ]
     
     post_ids = []
-    for i, post in enumerate(demo_posts):
-        # Create posts with staggered timestamps
-        cursor.execute('''
-            INSERT INTO posts (user_id, content, created_at)
-            VALUES (?, ?, ?)
-        ''', (post['user_id'], post['content'], datetime.now() - timedelta(hours=i*2)))
-        post_ids.append(cursor.lastrowid)
+    for i, post_data in enumerate(demo_posts):
+        new_post = Post(
+            user_id=post_data['user_id'],
+            content=post_data['content'],
+            created_at=datetime.utcnow() - timedelta(hours=i*2)
+        )
+        db.session.add(new_post)
+        db.session.flush()
+        post_ids.append(new_post.id)
     
-    conn.commit()
-    conn.close()
+    db.session.commit()
     print(f"✅ {len(post_ids)} posts de démonstration créés")
     return post_ids
 
 def seed_demo_groups(user_ids):
     """Créer des groupes de démonstration"""
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    
     demo_groups = [
         {
             'name': '🚀 Tech & Innovation East Africa',
@@ -180,40 +183,53 @@ def seed_demo_groups(user_ids):
     ]
     
     group_ids = []
-    for group in demo_groups:
-        cursor.execute('''
-            INSERT INTO groups (name, description, creator_id)
-            VALUES (?, ?, ?)
-        ''', (group['name'], group['description'], group['creator_id']))
-        group_id = cursor.lastrowid
+    for group_data in demo_groups:
+        # Check if group already exists (simple check by name)
+        existing_group = Group.query.filter_by(name=group_data['name']).first()
+        if existing_group:
+            print(f"Groupe {group_data['name']} existe déjà")
+            group_ids.append(existing_group.id)
+            continue
+
+        new_group = Group(
+            name=group_data['name'],
+            description=group_data['description'],
+            creator_id=group_data['creator_id'],
+            members_count=1
+        )
+        db.session.add(new_group)
+        db.session.flush()
+        group_id = new_group.id
         group_ids.append(group_id)
         
         # Add creator as admin member
-        cursor.execute('''
-            INSERT INTO group_members (group_id, user_id, is_admin)
-            VALUES (?, ?, 1)
-        ''', (group_id, group['creator_id']))
+        new_member = GroupMember(
+            group_id=group_id,
+            user_id=group_data['creator_id'],
+            is_admin=True
+        )
+        db.session.add(new_member)
         
         # Add some other members randomly
         for user_id in user_ids:
-            if user_id != group['creator_id'] and random.random() > 0.5:
-                try:
-                    cursor.execute('''
-                        INSERT INTO group_members (group_id, user_id, is_admin)
-                        VALUES (?, ?, 0)
-                    ''', (group_id, user_id))
-                except sqlite3.IntegrityError:
-                    pass  # Already a member
+            if user_id != group_data['creator_id'] and random.random() > 0.5:
+                # Check if already a member (to avoid IntegrityError)
+                existing_member = GroupMember.query.filter_by(group_id=group_id, user_id=user_id).first()
+                if not existing_member:
+                    new_member = GroupMember(
+                        group_id=group_id,
+                        user_id=user_id,
+                        is_admin=False
+                    )
+                    db.session.add(new_member)
+                    new_group.members_count += 1
     
-    conn.commit()
-    conn.close()
+    db.session.commit()
     print(f"✅ {len(group_ids)} groupes de démonstration créés")
     return group_ids
 
 def seed_demo_interactions(user_ids, post_ids):
     """Créer des likes et commentaires de démonstration"""
-    conn = get_db_connection()
-    cursor = conn.cursor()
     
     # Add random likes
     likes_count = 0
@@ -222,14 +238,12 @@ def seed_demo_interactions(user_ids, post_ids):
         num_likes = random.randint(2, 4)
         likers = random.sample(user_ids, min(num_likes, len(user_ids)))
         for user_id in likers:
-            try:
-                cursor.execute('''
-                    INSERT INTO likes (post_id, user_id)
-                    VALUES (?, ?)
-                ''', (post_id, user_id))
+            # Check if already liked (to avoid IntegrityError)
+            existing_like = Like.query.filter_by(post_id=post_id, user_id=user_id).first()
+            if not existing_like:
+                new_like = Like(post_id=post_id, user_id=user_id)
+                db.session.add(new_like)
                 likes_count += 1
-            except sqlite3.IntegrityError:
-                pass  # Already liked
     
     # Add some comments
     demo_comments = [
@@ -249,45 +263,51 @@ def seed_demo_interactions(user_ids, post_ids):
         num_comments = random.randint(1, 3)
         commenters = random.sample(user_ids, min(num_comments, len(user_ids)))
         for user_id in commenters:
-            comment = random.choice(demo_comments)
-            cursor.execute('''
-                INSERT INTO comments (post_id, user_id, content)
-                VALUES (?, ?, ?)
-            ''', (post_id, user_id, comment))
+            comment_content = random.choice(demo_comments)
+            new_comment = Comment(
+                post_id=post_id,
+                user_id=user_id,
+                content=comment_content
+            )
+            db.session.add(new_comment)
             comments_count += 1
-    
-    conn.commit()
-    conn.close()
+            
+    db.session.commit()
     print(f"✅ {likes_count} likes et {comments_count} commentaires ajoutés")
 
 def main():
     print("\n🌍 AESConnect - Ajout de contenu de démonstration\n")
     print("=" * 50)
     
-    try:
-        # Create demo users
-        user_ids = seed_demo_users()
-        
-        # Create demo posts
-        post_ids = seed_demo_posts(user_ids)
-        
-        # Create demo groups
-        group_ids = seed_demo_groups(user_ids)
-        
-        # Add interactions
-        seed_demo_interactions(user_ids, post_ids)
-        
-        print("\n" + "=" * 50)
-        print("✅ Contenu de démonstration ajouté avec succès !")
-        print("\nConnexion de test :")
-        print("  Username: amina_kenya")
-        print("  Password: demo123")
-        print("\n" + "=" * 50 + "\n")
-        
-    except Exception as e:
-        print(f"\n❌ Erreur : {e}")
-        import traceback
-        traceback.print_exc()
+    with app.app_context():
+        try:
+            # Assurer que les tables existent
+            db.create_all()
+            
+            # Create demo users
+            user_ids = seed_demo_users()
+            
+            # Create demo posts
+            post_ids = seed_demo_posts(user_ids)
+            
+            # Create demo groups
+            group_ids = seed_demo_groups(user_ids)
+            
+            # Add interactions
+            seed_demo_interactions(user_ids, post_ids)
+            
+            print("\n" + "=" * 50)
+            print("✅ Contenu de démonstration ajouté avec succès !")
+            print("\nConnexion de test :")
+            print("  Username: amina_kenya")
+            print("  Password: demo123")
+            print("\n" + "=" * 50 + "\n")
+            
+        except Exception as e:
+            db.session.rollback()
+            print(f"\n❌ Erreur : {e}")
+            import traceback
+            traceback.print_exc()
 
 if __name__ == '__main__':
     main()
