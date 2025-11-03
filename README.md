@@ -2,10 +2,18 @@
 
 [![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org)
 [![Flask](https://img.shields.io/badge/Flask-3.0.0-green.svg)](https://flask.palletsprojects.com)
+[![React](https://img.shields.io/badge/React-19.1+-61DAFB.svg)](https://reactjs.org)
+[![Vite](https://img.shields.io/badge/Vite-7.1+-646CFF.svg)](https://vitejs.dev)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Status](https://img.shields.io/badge/Status-Production%20Ready-success.svg)]()
 
 **AES Connect** est une plateforme de réseau social moderne dédiée à l'Alliance des États du Sahel (Mali, Burkina Faso, Niger). Elle permet aux citoyens de se connecter, partager, échanger et construire une communauté sahélienne forte et unie.
+
+## 🏗️ Architecture
+
+Ce projet utilise une **architecture moderne séparée** :
+- **Backend** : API REST Flask (port 5000)
+- **Frontend** : Application React + Vite (port 5173)
 
 ## ✨ Fonctionnalités Principales
 
@@ -36,85 +44,167 @@
 ## 🚀 Installation & Démarrage Rapide
 
 ### Prérequis
-- Python 3.8 ou supérieur
-- pip (gestionnaire de paquets Python)
+- **Python 3.8+** (pour le Backend)
+- **Node.js 16+** (pour le Frontend)
+- **pip** et **npm** (gestionnaires de paquets)
 
 ### Installation Locale
 
+#### 1️⃣ Backend (API Flask)
+
 ```bash
-# 1. Cloner le repository
+# Cloner le repository
 git clone https://github.com/Isco7702/aesconnect.git
 cd aesconnect
 
-# 2. Installer les dépendances
+# Installer les dépendances Backend
 pip install -r requirements.txt
 
-# 3. Lancer l'application
+# Configurer les variables d'environnement (optionnel pour développement)
+cp .env.example .env
+# Éditez .env avec vos clés Cloudinary si nécessaire
+
+# Lancer le Backend
 python3 app.py
 ```
 
-L'application sera accessible à l'adresse : **http://localhost:5000**
+Le Backend API sera accessible à : **http://localhost:5000**
 
-### Mode Production (avec Gunicorn)
+#### 2️⃣ Frontend (React + Vite)
 
+```bash
+# Dans un nouveau terminal
+cd aesconnect-frontend
+
+# Installer les dépendances
+npm install
+
+# Configurer l'URL de l'API
+cp .env.example .env
+# Le fichier .env pointe déjà vers http://localhost:5000
+
+# Lancer le Frontend
+npm run dev
+```
+
+Le Frontend sera accessible à : **http://localhost:5173**
+
+### Mode Production
+
+#### Backend (avec Gunicorn)
 ```bash
 gunicorn --bind 0.0.0.0:5000 app:app
 ```
 
+#### Frontend (Build)
+```bash
+cd aesconnect-frontend
+npm run build
+# Les fichiers de production seront dans le dossier dist/
+```
+
 ## 🌐 Déploiement sur Render
 
-### Déploiement Automatique
+### Architecture de Déploiement
 
-1. **Connectez-vous** à [render.com](https://render.com)
-2. **Créez un nouveau Web Service**
-3. **Connectez votre repository GitHub** : `Isco7702/aesconnect`
-4. Render détectera automatiquement le fichier `render.yaml`
-5. Le déploiement se fera automatiquement en ~5 minutes
+Le projet nécessite **DEUX services séparés** sur Render :
 
-### Configuration Manuelle
+#### 1️⃣ Backend API (Web Service Python)
 
-Si vous préférez configurer manuellement :
-
+**Configuration Backend :**
 - **Build Command** : `pip install -r requirements.txt`
 - **Start Command** : `gunicorn --bind 0.0.0.0:$PORT app:app`
 - **Environment** : Python 3
 
-### Variables d'Environnement (Optionnelles)
-
+**Variables d'Environnement Critiques :**
 ```env
+SECRET_KEY=votre_clé_secrète_unique_64_caractères
+CLOUDINARY_CLOUD_NAME=votre_cloud_name
+CLOUDINARY_API_KEY=votre_api_key
+CLOUDINARY_API_SECRET=votre_api_secret
+ADMIN_PASSWORD=votre_mot_de_passe_admin
 FLASK_ENV=production
-SECRET_KEY=votre_clé_secrète_générée
 DATABASE_PATH=/opt/render/project/src/social_network.db
 ```
+
+**Générer une clé secrète** :
+```bash
+python3 -c "import secrets; print(secrets.token_hex(32))"
+```
+
+L'URL de votre API sera : `https://aesconnect-api.onrender.com` (exemple)
+
+#### 2️⃣ Frontend React (Static Site ou Web Service)
+
+**Configuration Frontend :**
+- **Build Command** : `cd aesconnect-frontend && npm install && npm run build`
+- **Publish Directory** : `aesconnect-frontend/dist`
+
+**Variables d'Environnement Frontend :**
+```env
+VITE_API_BASE_URL=https://votre-api-render-url.onrender.com
+```
+
+⚠️ **Important** : Remplacez `votre-api-render-url.onrender.com` par l'URL réelle de votre Backend API déployé.
+
+### Déploiement Automatique (Recommandé)
+
+1. **Connectez-vous** à [render.com](https://render.com)
+2. **Créez le Backend** :
+   - New + → Web Service
+   - Connectez `Isco7702/aesconnect`
+   - Configurez comme décrit ci-dessus
+3. **Créez le Frontend** :
+   - New + → Static Site
+   - Même repository : `Isco7702/aesconnect`
+   - Configurez avec les paramètres Frontend
+
+📖 Voir le guide détaillé : [GUIDE_DEPLOIEMENT_RENDER.md](GUIDE_DEPLOIEMENT_RENDER.md)
 
 ## 📁 Structure du Projet
 
 ```
 aesconnect/
-├── app.py                  # Application Flask principale (590+ lignes)
-├── requirements.txt        # Dépendances Python
-├── render.yaml            # Configuration Render
-├── create_admin.py        # Script de création d'admin
-├── .gitignore             # Fichiers à ignorer
-├── templates/
-│   └── index.html         # Interface utilisateur complète (44KB)
-├── README.md              # Ce fichier
-├── STATUS_PROJET.md       # État détaillé du projet
-└── DEMARRAGE_RAPIDE.md    # Guide de lancement rapide
+├── Backend (API Flask)
+│   ├── app.py                     # API REST Flask principale
+│   ├── requirements.txt           # Dépendances Python
+│   ├── render.yaml               # Configuration déploiement Backend
+│   ├── create_admin.py           # Script de création d'admin
+│   ├── .env.example              # Variables d'environnement (exemple)
+│   └── static/                   # Fichiers statiques (favicon, etc.)
+│
+├── Frontend (React + Vite)
+│   └── aesconnect-frontend/
+│       ├── src/
+│       │   ├── pages/            # Pages React (Login, Register, Feed)
+│       │   ├── contexts/         # Contexte d'authentification
+│       │   ├── services/         # Services API (Axios)
+│       │   └── App.jsx           # Composant principal avec routes
+│       ├── package.json          # Dépendances Frontend
+│       ├── vite.config.js        # Configuration Vite
+│       └── .env.example          # Variables d'environnement Frontend
+│
+├── Documentation
+│   ├── README.md                 # Ce fichier
+│   ├── GUIDE_DEPLOIEMENT_RENDER.md
+│   └── GUIDE_LANCEMENT_COMPLET.md
 ```
 
 ## 🛠️ Technologies Utilisées
 
-### Backend
-- **Flask 3.0.0** - Framework web Python
+### Backend (API REST)
+- **Flask 3.0.0** - Framework web Python pour API REST
+- **Flask-CORS** - Gestion des requêtes cross-origin
 - **SQLite** - Base de données relationnelle
 - **Werkzeug** - Sécurité et hachage des mots de passe
 - **Gunicorn** - Serveur WSGI pour production
 
-### Frontend
-- **HTML5 / CSS3** - Structure et style
-- **JavaScript (Vanilla)** - Logique applicative
-- **Responsive Design** - Compatible tous appareils
+### Frontend (SPA React)
+- **React 19.1** - Bibliothèque d'interface utilisateur
+- **Vite 7.1** - Build tool ultra-rapide
+- **React Router** - Gestion des routes côté client
+- **Axios** - Client HTTP pour requêtes API
+- **CSS3 moderne** - Styles responsive
 
 ## 🔐 Sécurité
 
