@@ -1,9 +1,9 @@
 from flask_smorest import Blueprint, abort
 from flask import request, jsonify, session, current_app
-from ...utils.notifications import create_notification
-from ..models import db, Post, User, Like, Comment
-# # from ..database import get_raw_db_connection # Fonctions SQLite brutes (obsolète) (obsolète)
-from .auth import require_login # Décorateur d'authentification
+from utils.notifications import create_notification
+from models import db, Post, User, Like, Comment
+# # from database import get_raw_db_connection # Fonctions SQLite brutes (obsolète) (obsolète)
+from routes.auth import require_login # Décorateur d'authentification
 
 posts_bp = Blueprint('posts', __name__, url_prefix='/posts')
 
@@ -87,8 +87,8 @@ def create_post():
             upload_result = upload(image_file, folder="aesconnect_posts")
             image_url = upload_result.get('secure_url')
             
-           if not image_url:
-                abort(500, message='Échec de l\\'upload de l\\'image')        
+            if not image_url:
+                abort(500, message="Échec de l'upload de l'image")        
         new_post = Post(
             user_id=session['user_id'],
             content=content,

@@ -1,11 +1,10 @@
 from flask_smorest import Blueprint, abort
 from flask import request, jsonify, session, current_app
-from ..models import db, User, Message
-from ..schemas import MessageSchema, MessageSendSchema, SuccessSchema
-from ...utils.notifications import create_notification
-from ..models import db, User
-# from ..database import get_raw_db_connection # Fonctions SQLite brutes (obsolète)
-from .auth import require_login
+from models import db, User, Message
+from schemas import MessageSchema, MessageSendSchema, SuccessSchema
+from utils.notifications import create_notification
+# from database import get_raw_db_connection # Fonctions SQLite brutes (obsolète)
+from routes.auth import require_login
 
 messages_bp = Blueprint('messages', __name__, url_prefix='/messages')
 

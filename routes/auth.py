@@ -1,9 +1,9 @@
 from flask_smorest import Blueprint, abort
 from flask import request, jsonify, session, current_app
-from ..models import db, User
+from models import db, User
 from cloudinary.uploader import upload
 from werkzeug.security import generate_password_hash, check_password_hash
-from ..schemas import UserSchema, UserRegisterSchema, UserLoginSchema, SuccessSchema
+from schemas import UserSchema, UserRegisterSchema, UserLoginSchema, SuccessSchema
 
 auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
 
@@ -135,7 +135,7 @@ def upload_avatar():
         avatar_url = upload_result.get('secure_url')
         
         if not avatar_url:
-            abort(500, message='Échec de l\\'upload de l\\'avatar')
+            abort(500, message="Échec de l'upload de l'avatar")
             
         # Mise à jour de l'URL dans la base de données
         user = User.query.get(session['user_id'])
