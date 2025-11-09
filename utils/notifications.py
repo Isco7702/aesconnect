@@ -1,4 +1,4 @@
-from ..models import db, Notification
+from models import db, Notification
 from datetime import datetime
 
 def create_notification(user_id, message, entity_type=None, entity_id=None):

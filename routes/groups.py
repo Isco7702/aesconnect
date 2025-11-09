@@ -1,10 +1,9 @@
 from flask_smorest import Blueprint, abort
 from flask import request, jsonify, session, current_app
-from ...utils.notifications import create_notification
-from ...utils.notifications import create_notification
-from ..models import db, User, Post, Comment, Like
-# from ..database import get_raw_db_connection # Fonctions SQLite brutes (obsolète)
-from .auth import require_login # Décorateur d'authentification
+from utils.notifications import create_notification
+from models import db, User, Post, Comment, Like
+# from database import get_raw_db_connection # Fonctions SQLite brutes (obsolète)
+from routes.auth import require_login # Décorateur d'authentification
 
 groups_bp = Blueprint('groups', __name__, url_prefix='/groups')
 
