@@ -1,7 +1,7 @@
 from flask_smorest import Blueprint, abort
 from flask import request, jsonify, session, current_app
-from ..schemas import UserSchema, ReportCreateSchema, SuccessSchema
-from ..models import db, Report, User
+from schemas import UserSchema, ReportCreateSchema, SuccessSchema
+from models import db, Report, User
 
 from .auth import require_login
 

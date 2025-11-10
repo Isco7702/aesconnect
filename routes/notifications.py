@@ -1,6 +1,6 @@
 from flask_smorest import Blueprint, abort
 from flask import request, jsonify, session, current_app
-from ..models import db, Notification
+from models import db, Notification
 from .auth import require_login
 
 notifications_bp = Blueprint('notifications', __name__, url_prefix='/notifications')
