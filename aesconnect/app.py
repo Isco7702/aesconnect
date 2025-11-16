@@ -66,6 +66,12 @@ def serve_frontend(path):
     # On sert l'index.html pour toutes les routes non gérées par l'API
     return send_from_directory(FRONTEND_FOLDER, 'index.html')
 
+# Gestionnaire d'erreur 404 pour servir le Frontend
+@app.errorhandler(404)
+def not_found(error):
+    # Servir le Frontend pour toutes les routes non trouvées
+    return send_from_directory(FRONTEND_FOLDER, 'index.html')
+
 # --- Routes de base pour l'API ---
 
 
