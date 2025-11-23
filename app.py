@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, session, Blueprint
+from flask import Flask, request, jsonify, session, Blueprint, render_template
 from flask_cors import CORS
 from flask_smorest import Api
 import os
@@ -12,9 +12,11 @@ app = Flask(__name__)
 app.config['API_TITLE'] = 'AESConnect API'
 app.config['API_VERSION'] = 'v1'
 app.config['OPENAPI_VERSION'] = '3.0.2'
-api = Api(app)
 app.secret_key = os.environ.get('SECRET_KEY', secrets.token_hex(32))
 CORS(app, supports_credentials=True)
+
+# Créer une instance d'Api avec un préfixe pour toutes les routes API
+api = Api(app)
 
 # --- Configuration de Cloudinary ---
 cloudinary.config(
@@ -35,7 +37,7 @@ db.init_app(app)
 with app.app_context():
     db.create_all()
 
-# --- Enregistrement des Blueprints ---
+# --- Enregistrement des Blueprints API ---
 from routes.auth import auth_bp
 from routes.posts import posts_bp
 from routes.groups import groups_bp
@@ -50,14 +52,30 @@ api.register_blueprint(messages_bp)
 api.register_blueprint(utils_bp)
 api.register_blueprint(notifications_bp)
 
-# --- Routes de base pour l'API ---
+# --- Enregistrement des routes frontend (compatibilité) ---
+from frontend_routes import register_frontend_routes
+register_frontend_routes(app)
+
+# --- Routes de base ---
 @app.route('/')
 def index():
-    """Endpoint de base de l'API"""
+    """Page d'accueil - Interface utilisateur"""
+    return render_template('index.html')
+
+@app.route('/api')
+def api_info():
+    """Information sur l'API"""
     return jsonify({
         'status': 'API Running',
         'version': '1.0',
-        'message': 'Welcome to the AESConnect API. Use /health to check database status.'
+        'message': 'Welcome to the AESConnect API. Use /api/health to check database status.',
+        'endpoints': {
+            'auth': '/api/auth',
+            'posts': '/api/posts',
+            'groups': '/api/groups',
+            'messages': '/api/messages',
+            'notifications': '/api/notifications'
+        }
     })
 
 # --- Exécution de l'application ---
