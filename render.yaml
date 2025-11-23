@@ -3,14 +3,14 @@ services:
     name: aesconnect
     env: python
     plan: free
-    buildCommand: cd aesconnect-frontend && npm install && npm run build && cd ../aesconnect && pip install -r requirements.txt
-    startCommand: gunicorn --bind 0.0.0.0:$PORT aesconnect.app:app
-    healthCheckPath: /utils/health
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn --bind 0.0.0.0:$PORT app:app
+    healthCheckPath: /api
     envVars:
       - key: FLASK_ENV
         value: production
       - key: FLASK_APP
-        value: aesconnect/app.py
+        value: app.py
       - key: DATABASE_PATH
         value: /opt/render/project/src/social_network.db
     disk:
