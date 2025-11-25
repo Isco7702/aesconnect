@@ -117,6 +117,38 @@ def get_profile():
         current_app.logger.error(f"Erreur: {e}")
         abort(500, message=str(e))
 
+@auth_bp.route('/profile', methods=['PUT'])
+@require_login
+def update_profile():
+    """Update user profile"""
+    try:
+        user = User.query.get(session['user_id'])
+        if not user:
+            abort(404, message='Utilisateur non trouvé')
+        
+        data = request.get_json()
+        
+        # Mise à jour des champs autorisés
+        if 'full_name' in data:
+            user.full_name = data['full_name']
+        if 'bio' in data:
+            user.bio = data['bio']
+        if 'country' in data:
+            user.country = data['country']
+        if 'city' in data:
+            user.city = data['city']
+        if 'avatar_url' in data:
+            user.avatar_url = data['avatar_url']
+        
+        db.session.commit()
+        
+        return jsonify(user.to_dict())
+        
+    except Exception as e:
+        current_app.logger.error(f"Erreur update profile: {e}")
+        db.session.rollback()
+        abort(500, message=str(e))
+
 @auth_bp.route('/profile/avatar', methods=['POST'])
 @require_login
 def upload_avatar():

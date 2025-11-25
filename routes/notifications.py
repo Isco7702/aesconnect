@@ -5,7 +5,7 @@ from .auth import require_login
 
 notifications_bp = Blueprint('notifications', __name__, url_prefix='/notifications')
 
-@notifications_bp.route('/', methods=['GET'])
+@notifications_bp.route('/notifications', methods=['GET'])
 @require_login
 def get_notifications():
     """Get the user's notifications"""
@@ -30,7 +30,55 @@ def get_notifications():
         current_app.logger.error(f"Erreur lors de la récupération des notifications: {e}")
         abort(500, message=str(e))
 
-@notifications_bp.route('/mark_read', methods=['POST'])
+@notifications_bp.route('/notifications/<int:notification_id>/read', methods=['PUT'])
+@require_login
+def mark_notification_as_read(notification_id):
+    """Mark a specific notification as read"""
+    try:
+        user_id = session['user_id']
+        
+        notification = Notification.query.filter_by(id=notification_id, user_id=user_id).first()
+        if not notification:
+            abort(404, message='Notification non trouvée')
+        
+        notification.is_read = True
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Notification marquée comme lue'
+        })
+        
+    except Exception as e:
+        current_app.logger.error(f"Erreur: {e}")
+        db.session.rollback()
+        abort(500, message=str(e))
+
+@notifications_bp.route('/notifications/<int:notification_id>', methods=['DELETE'])
+@require_login
+def delete_notification(notification_id):
+    """Delete a specific notification"""
+    try:
+        user_id = session['user_id']
+        
+        notification = Notification.query.filter_by(id=notification_id, user_id=user_id).first()
+        if not notification:
+            abort(404, message='Notification non trouvée')
+        
+        db.session.delete(notification)
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Notification supprimée'
+        })
+        
+    except Exception as e:
+        current_app.logger.error(f"Erreur: {e}")
+        db.session.rollback()
+        abort(500, message=str(e))
+
+@notifications_bp.route('/notifications/mark-all-read', methods=['PUT'])
 @require_login
 def mark_all_as_read():
     """Mark all notifications as read"""
