@@ -3,21 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="AESConnect - Le réseau social des jeunes d'Afrique de l'Est. Connecte, Partage, Inspire.">
-    <meta name="theme-color" content="#22c55e">
+    <meta name="description" content="AESConnect - Le réseau social du Sahel. Notre voix, notre espace, notre Sahel.">
+    <meta name="theme-color" content="#2E8B57">
     
-    <!-- PWA Meta Tags -->
-    <link rel="manifest" href="/static/manifest.json">
-    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
-    <link rel="apple-touch-icon" href="/static/icons/icon-192x192.png">
-    
-    <!-- Preload critical resources -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    
-    <title>AESConnect - Réseau Social d'Afrique de l'Est</title>
-    
-    <!-- External CSS -->
-    <link rel="stylesheet" href="/static/styles.css">
+    <title>AESConnect - Notre voix, notre espace, notre Sahel</title>
     
     <style>
         * {
@@ -26,18 +15,29 @@
             box-sizing: border-box;
         }
 
+        :root {
+            --aes-green: #2E8B57;
+            --aes-red: #DC143C;
+            --aes-yellow: #FFD700;
+            --dark-bg: #1a1a1a;
+            --light-bg: #f5f5f5;
+            --text-dark: #1c1e21;
+            --text-light: #65676b;
+            --border-color: #e4e6ea;
+        }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: #f0f2f5;
+            background: var(--light-bg);
             line-height: 1.6;
         }
 
-        /* Header */
+        /* Header avec couleurs AES */
         .header {
-            background: #1877f2;
+            background: linear-gradient(135deg, var(--aes-green) 0%, var(--aes-red) 100%);
             color: white;
-            padding: 12px 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 15px 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
             position: fixed;
             top: 0;
             left: 0;
@@ -48,9 +48,27 @@
             align-items: center;
         }
 
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
         .header h1 {
             font-size: 28px;
             font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .flags {
+            font-size: 24px;
+        }
+
+        .motto {
+            font-size: 13px;
+            opacity: 0.95;
+            font-style: italic;
+            margin-top: 3px;
         }
 
         .header-actions {
@@ -60,18 +78,19 @@
         }
 
         .header-actions button {
-            background: rgba(255,255,255,0.2);
-            border: none;
+            background: rgba(255,255,255,0.25);
+            border: 1px solid rgba(255,255,255,0.4);
             color: white;
-            padding: 8px 16px;
-            border-radius: 6px;
+            padding: 8px 18px;
+            border-radius: 8px;
             cursor: pointer;
-            font-weight: 500;
-            transition: background 0.2s;
+            font-weight: 600;
+            transition: all 0.3s;
         }
 
         .header-actions button:hover {
-            background: rgba(255,255,255,0.3);
+            background: rgba(255,255,255,0.35);
+            transform: translateY(-2px);
         }
 
         .user-info {
@@ -81,20 +100,22 @@
         }
 
         .avatar {
-            width: 32px;
-            height: 32px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
-            background: #42b883;
+            background: var(--aes-yellow);
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
+            color: var(--dark-bg);
             font-weight: bold;
+            font-size: 16px;
+            border: 2px solid white;
         }
 
         /* Main Container */
         .main-container {
-            margin-top: 70px;
+            margin-top: 95px;
             display: flex;
             max-width: 1200px;
             margin-left: auto;
@@ -107,10 +128,10 @@
         .sidebar {
             width: 280px;
             background: white;
-            border-radius: 8px;
+            border-radius: 12px;
             padding: 20px;
             height: fit-content;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
 
         .sidebar-section {
@@ -119,29 +140,33 @@
 
         .sidebar-section h3 {
             margin-bottom: 15px;
-            color: #1c1e21;
+            color: var(--aes-green);
             font-size: 16px;
             font-weight: 600;
+            border-bottom: 2px solid var(--aes-green);
+            padding-bottom: 8px;
         }
 
         .sidebar-item {
-            padding: 10px;
-            border-radius: 6px;
+            padding: 12px;
+            border-radius: 8px;
             cursor: pointer;
-            transition: background 0.2s;
-            margin-bottom: 5px;
+            transition: all 0.2s;
+            margin-bottom: 8px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
+            font-weight: 500;
         }
 
         .sidebar-item:hover {
-            background: #f0f2f5;
+            background: var(--light-bg);
+            transform: translateX(5px);
         }
 
         .sidebar-item.active {
-            background: #e3f2fd;
-            color: #1877f2;
+            background: linear-gradient(135deg, var(--aes-green), var(--aes-red));
+            color: white;
         }
 
         /* Main Content */
@@ -153,28 +178,31 @@
         /* Create Post */
         .create-post {
             background: white;
-            border-radius: 8px;
+            border-radius: 12px;
             padding: 20px;
             margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border-left: 4px solid var(--aes-green);
         }
 
         .create-post textarea {
             width: 100%;
-            border: none;
+            border: 2px solid var(--border-color);
             resize: none;
             font-size: 16px;
-            padding: 12px;
-            border-radius: 8px;
-            background: #f0f2f5;
+            padding: 15px;
+            border-radius: 10px;
+            background: var(--light-bg);
             margin-bottom: 15px;
             font-family: inherit;
+            transition: all 0.3s;
         }
 
         .create-post textarea:focus {
             outline: none;
             background: white;
-            box-shadow: 0 0 0 2px #1877f2;
+            border-color: var(--aes-green);
+            box-shadow: 0 0 0 3px rgba(46, 139, 87, 0.1);
         }
 
         .post-actions {
@@ -184,52 +212,59 @@
         }
 
         .btn {
-            background: #1877f2;
+            background: linear-gradient(135deg, var(--aes-green), var(--aes-red));
             color: white;
             border: none;
-            padding: 10px 20px;
-            border-radius: 6px;
+            padding: 12px 24px;
+            border-radius: 8px;
             cursor: pointer;
             font-weight: 600;
-            transition: background 0.2s;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(46, 139, 87, 0.3);
         }
 
         .btn:hover {
-            background: #166fe5;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(46, 139, 87, 0.4);
         }
 
         .btn-secondary {
-            background: #42b883;
-        }
-
-        .btn-secondary:hover {
-            background: #369870;
+            background: linear-gradient(135deg, var(--aes-yellow), #FFA500);
+            color: var(--dark-bg);
         }
 
         .btn-outline {
-            background: transparent;
-            color: #65676b;
-            border: 1px solid #ccd0d5;
+            background: white;
+            color: var(--aes-green);
+            border: 2px solid var(--aes-green);
         }
 
         .btn-outline:hover {
-            background: #f0f2f5;
+            background: var(--aes-green);
+            color: white;
         }
 
         /* Posts */
         .post {
             background: white;
-            border-radius: 8px;
+            border-radius: 12px;
             margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .post:hover {
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
         }
 
         .post-header {
             padding: 15px 20px;
             display: flex;
             align-items: center;
-            gap: 10px;
-            border-bottom: 1px solid #e4e6ea;
+            gap: 12px;
+            border-bottom: 1px solid var(--border-color);
+            background: linear-gradient(to right, rgba(46, 139, 87, 0.05), rgba(220, 20, 60, 0.05));
         }
 
         .post-author {
@@ -238,25 +273,25 @@
 
         .post-author-name {
             font-weight: 600;
-            color: #1c1e21;
+            color: var(--aes-green);
             margin-bottom: 2px;
         }
 
         .post-time {
-            color: #65676b;
+            color: var(--text-light);
             font-size: 13px;
         }
 
         .post-content {
-            padding: 15px 20px;
-            color: #1c1e21;
+            padding: 20px;
+            color: var(--text-dark);
             font-size: 15px;
-            line-height: 1.4;
+            line-height: 1.5;
         }
 
         .post-actions-bar {
-            padding: 8px 20px;
-            border-top: 1px solid #e4e6ea;
+            padding: 10px 20px;
+            border-top: 1px solid var(--border-color);
             display: flex;
             gap: 10px;
         }
@@ -265,24 +300,25 @@
             flex: 1;
             background: none;
             border: none;
-            padding: 8px;
-            border-radius: 6px;
+            padding: 10px;
+            border-radius: 8px;
             cursor: pointer;
-            color: #65676b;
+            color: var(--text-light);
             font-weight: 600;
-            transition: background 0.2s;
+            transition: all 0.2s;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 5px;
+            gap: 6px;
         }
 
         .post-action:hover {
-            background: #f0f2f5;
+            background: var(--light-bg);
+            color: var(--aes-green);
         }
 
         .post-action.liked {
-            color: #1877f2;
+            color: var(--aes-red);
         }
 
         /* Right Panel */
@@ -292,17 +328,19 @@
 
         .panel-section {
             background: white;
-            border-radius: 8px;
+            border-radius: 12px;
             padding: 20px;
             margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
 
         .panel-section h3 {
             margin-bottom: 15px;
-            color: #1c1e21;
+            color: var(--aes-red);
             font-size: 16px;
             font-weight: 600;
+            border-bottom: 2px solid var(--aes-red);
+            padding-bottom: 8px;
         }
 
         /* Auth Forms */
@@ -312,7 +350,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(255,255,255,0.8);
+            background: rgba(0,0,0,0.7);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -322,42 +360,50 @@
         .auth-form {
             background: white;
             padding: 40px;
-            border-radius: 8px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
             width: 100%;
-            max-width: 400px;
+            max-width: 420px;
+            border-top: 5px solid var(--aes-green);
         }
 
         .auth-form h2 {
-            margin-bottom: 20px;
-            color: #1c1e21;
+            margin-bottom: 10px;
+            color: var(--aes-green);
             text-align: center;
+            font-size: 28px;
+        }
+
+        .auth-form .flags {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 20px;
         }
 
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 18px;
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 5px;
-            color: #1c1e21;
-            font-weight: 500;
+            margin-bottom: 6px;
+            color: var(--text-dark);
+            font-weight: 600;
         }
 
         .form-control {
             width: 100%;
-            padding: 12px;
-            border: 1px solid #dddfe2;
-            border-radius: 6px;
+            padding: 14px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
             font-size: 16px;
-            transition: border-color 0.2s;
+            transition: all 0.3s;
         }
 
         .form-control:focus {
             outline: none;
-            border-color: #1877f2;
-            box-shadow: 0 0 0 2px rgba(24, 119, 242, 0.2);
+            border-color: var(--aes-green);
+            box-shadow: 0 0 0 3px rgba(46, 139, 87, 0.1);
         }
 
         .auth-actions {
@@ -373,16 +419,17 @@
         /* Notifications */
         .notification {
             position: fixed;
-            top: 80px;
+            top: 110px;
             right: 20px;
-            padding: 15px 20px;
-            border-radius: 6px;
+            padding: 16px 24px;
+            border-radius: 10px;
             color: white;
-            font-weight: 500;
+            font-weight: 600;
             z-index: 3000;
             opacity: 0;
             transform: translateX(100px);
-            transition: all 0.3s;
+            transition: all 0.4s;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
 
         .notification.show {
@@ -391,79 +438,62 @@
         }
 
         .notification.success {
-            background: #42b883;
+            background: linear-gradient(135deg, var(--aes-green), #228B22);
         }
 
         .notification.error {
-            background: #e74c3c;
+            background: linear-gradient(135deg, var(--aes-red), #B22222);
         }
 
-        /* Groups */
-        .group-item {
+        /* Groups & Messages */
+        .group-item, .message-item {
             display: flex;
             align-items: center;
-            gap: 10px;
-            padding: 10px;
-            border-radius: 6px;
-            margin-bottom: 8px;
+            gap: 12px;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: all 0.2s;
+            border: 1px solid transparent;
         }
 
-        .group-item:hover {
-            background: #f0f2f5;
+        .group-item:hover, .message-item:hover {
+            background: var(--light-bg);
+            border-color: var(--aes-green);
         }
 
         .group-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 6px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            width: 44px;
+            height: 44px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, var(--aes-green), var(--aes-red));
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
             font-weight: bold;
+            font-size: 18px;
         }
 
         .group-info h4 {
-            margin-bottom: 2px;
-            color: #1c1e21;
-            font-size: 14px;
+            margin-bottom: 3px;
+            color: var(--text-dark);
+            font-size: 15px;
         }
 
         .group-info p {
-            color: #65676b;
-            font-size: 12px;
-        }
-
-        /* Messages */
-        .message-item {
-            display: flex;
-            gap: 10px;
-            padding: 10px;
-            border-radius: 6px;
-            margin-bottom: 8px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .message-item:hover {
-            background: #f0f2f5;
+            color: var(--text-light);
+            font-size: 13px;
         }
 
         .message-item.unread {
-            background: #e3f2fd;
-        }
-
-        .message-info h4 {
-            margin-bottom: 2px;
-            color: #1c1e21;
-            font-size: 14px;
+            background: rgba(46, 139, 87, 0.1);
+            border-color: var(--aes-green);
         }
 
         .message-preview {
-            color: #65676b;
+            color: var(--text-light);
             font-size: 13px;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -474,12 +504,13 @@
         /* Loading */
         .loading {
             text-align: center;
-            padding: 20px;
-            color: #65676b;
+            padding: 30px;
+            color: var(--text-light);
+            font-style: italic;
         }
 
         .hidden {
-            display: none;
+            display: none !important;
         }
 
         /* Responsive */
@@ -503,44 +534,15 @@
             }
 
             .header h1 {
-                font-size: 24px;
+                font-size: 22px;
             }
 
-            .header-actions {
-                gap: 10px;
+            .flags {
+                font-size: 18px;
             }
 
-            .auth-form {
-                margin: 20px;
-                padding: 30px 20px;
-            }
-        }
-        /* Responsive */
-        @media (max-width: 768px) {
-            .main-container {
-                flex-direction: column;
-                padding: 10px;
-            }
-
-            .sidebar, .right-panel {
-                width: 100%;
-                order: 2;
-            }
-
-            .main-content {
-                order: 1;
-            }
-
-            .header {
-                padding: 10px 15px;
-            }
-
-            .header h1 {
-                font-size: 24px;
-            }
-
-            .header-actions {
-                gap: 10px;
+            .motto {
+                display: none;
             }
 
             .auth-form {
@@ -553,7 +555,13 @@
 <body>
     <!-- Header -->
     <div class="header">
-        <h1>AESConnect</h1>
+        <div class="header-left">
+            <div>
+                <h1>AESConnect</h1>
+                <div class="motto">Notre voix, notre espace, notre Sahel</div>
+            </div>
+            <div class="flags">🇲🇱 🇧🇫 🇳🇪</div>
+        </div>
         <div class="header-actions">
             <div id="user-info" class="user-info hidden">
                 <div class="avatar" id="user-avatar">U</div>
@@ -596,7 +604,7 @@
             <div id="feed-section">
                 <!-- Create Post -->
                 <div class="create-post">
-                    <textarea id="post-content" placeholder="Que pensez-vous ?"></textarea>
+                    <textarea id="post-content" placeholder="Que pensez-vous ? Partagez avec le Sahel ! 🌍" rows="3"></textarea>
                     <div class="post-actions">
                         <div></div>
                         <button class="btn" onclick="createPost()">Publier</button>
@@ -618,14 +626,14 @@
                     </div>
                     
                     <!-- Send Message Form -->
-                    <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e4e6ea;">
+                    <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border-color);">
                         <h4>Envoyer un message</h4>
                         <div class="form-group">
                             <input type="text" id="search-users" class="form-control" placeholder="Rechercher un utilisateur...">
                             <div id="users-search-results"></div>
                         </div>
                         <div class="form-group">
-                            <textarea id="message-content" class="form-control" placeholder="Votre message..."></textarea>
+                            <textarea id="message-content" class="form-control" placeholder="Votre message..." rows="3"></textarea>
                         </div>
                         <button class="btn" onclick="sendMessage()">Envoyer</button>
                     </div>
@@ -653,7 +661,7 @@
                     </div>
                     <div class="form-group">
                         <label>Description</label>
-                        <textarea id="group-description" class="form-control" placeholder="Description du groupe"></textarea>
+                        <textarea id="group-description" class="form-control" placeholder="Description du groupe" rows="3"></textarea>
                     </div>
                     <div class="form-group">
                         <label>
@@ -674,7 +682,7 @@
             <div class="panel-section">
                 <h3>👋 Amis en ligne</h3>
                 <div id="online-friends">
-                    <p style="color: #65676b; font-size: 14px;">Aucun ami en ligne</p>
+                    <p style="color: var(--text-light); font-size: 14px;">Aucun ami en ligne</p>
                 </div>
             </div>
 
@@ -682,7 +690,7 @@
             <div class="panel-section">
                 <h3>🔍 Groupes suggérés</h3>
                 <div id="suggested-groups">
-                    <p style="color: #65676b; font-size: 14px;">Aucun groupe suggéré</p>
+                    <p style="color: var(--text-light); font-size: 14px;">Aucun groupe suggéré</p>
                 </div>
             </div>
         </div>
@@ -692,6 +700,7 @@
     <div id="auth-modal" class="auth-container hidden">
         <!-- Login Form -->
         <div id="login-form" class="auth-form">
+            <div class="flags">🇲🇱 🇧🇫 🇳🇪</div>
             <h2>Connexion</h2>
             <form onsubmit="login(event)">
                 <div class="form-group">
@@ -706,14 +715,15 @@
                     <button type="submit" class="btn">Se connecter</button>
                     <button type="button" class="btn-outline" onclick="hideAuth()">Annuler</button>
                 </div>
-                <p style="text-align: center; margin-top: 15px; color: #65676b;">
-                    Pas de compte ? <a href="#" onclick="showRegister()" style="color: #1877f2;">S'inscrire</a>
+                <p style="text-align: center; margin-top: 15px; color: var(--text-light);">
+                    Pas de compte ? <a href="#" onclick="showRegister()" style="color: var(--aes-green); font-weight: 600;">S'inscrire</a>
                 </p>
             </form>
         </div>
 
         <!-- Register Form -->
         <div id="register-form" class="auth-form hidden">
+            <div class="flags">🇲🇱 🇧🇫 🇳🇪</div>
             <h2>S'inscrire</h2>
             <form onsubmit="register(event)">
                 <div class="form-group">
@@ -736,8 +746,8 @@
                     <button type="submit" class="btn btn-secondary">S'inscrire</button>
                     <button type="button" class="btn-outline" onclick="hideAuth()">Annuler</button>
                 </div>
-                <p style="text-align: center; margin-top: 15px; color: #65676b;">
-                    Déjà un compte ? <a href="#" onclick="showLogin()" style="color: #1877f2;">Se connecter</a>
+                <p style="text-align: center; margin-top: 15px; color: var(--text-light);">
+                    Déjà un compte ? <a href="#" onclick="showLogin()" style="color: var(--aes-green); font-weight: 600;">Se connecter</a>
                 </p>
             </form>
         </div>
@@ -1134,7 +1144,7 @@
             messagesEl.innerHTML = messages.map(message => `
                 <div class="message-item ${!message.is_read ? 'unread' : ''}">
                     <div class="avatar">${(message.sender_name || 'U')[0].toUpperCase()}</div>
-                    <div class="message-info">
+                    <div class="group-info">
                         <h4>${message.sender_id === currentUser.id ? `À ${message.receiver_name}` : `De ${message.sender_name}`}</h4>
                         <div class="message-preview">${message.content}</div>
                         <div class="post-time">${formatTime(message.created_at)}</div>
@@ -1175,7 +1185,7 @@
                         </div>
                     `).join('');
                 } else {
-                    document.getElementById('users-search-results').innerHTML = '<p style="padding: 10px; color: #65676b;">Aucun utilisateur trouvé</p>';
+                    document.getElementById('users-search-results').innerHTML = '<p style="padding: 10px; color: var(--text-light);">Aucun utilisateur trouvé</p>';
                 }
             } catch (error) {
                 console.error('Erreur de recherche:', error);
