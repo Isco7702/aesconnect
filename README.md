@@ -1,55 +1,85 @@
-# AESConnect
+# AES Connect - Reseau Social de l'Alliance des Etats du Sahel
 
-**Notre voix, notre espace, notre Sahel** 🇲🇱 🇧🇫 🇳🇪
+Le reseau social moderne et securise pour les citoyens du Mali, du Burkina Faso et du Niger.
 
-## Description
+**Notre voix, notre espace, notre Sahel.**
 
-Réseau social monolithique pour les jeunes du Sahel (Mali, Burkina Faso, Niger).
-Backend Flask + Frontend intégré, déployé sur Render.
+## Fonctionnalites
 
-## Fonctionnalités
+### Reseau Social Complet
+- Profils utilisateurs avec photos et bio
+- Publications avec images, localisation et humeurs
+- Systeme de reactions (like, love, support, celebrate, think)
+- Commentaires avec reponses en threads
+- Systeme de follow/unfollow
+- Messagerie privee en temps reel
+- Notifications
+- Groupes (publics et prives)
+- Recherche globale (utilisateurs, posts, groupes)
+- Page Decouvrir avec suggestions
 
-- ✅ Inscription et connexion
-- ✅ Création et partage de posts
-- ✅ Système de likes et commentaires
-- ✅ Groupes communautaires
-- ✅ Messagerie privée
-- ✅ Recherche d'utilisateurs
+### Contenu Culturel AES
+- Proverbe sahelien du jour (30+ proverbes)
+- Calendrier culturel (fetes nationales, evenements)
+- 10 groupes par defaut (communautes AES)
 
-## Technologies
+### Securite
+- Authentification JWT avec tokens securises
+- Hashage bcrypt des mots de passe
+- Validation stricte des inputs
+- Rate limiting sur les endpoints critiques
+- Protection XSS et injection
+- Systeme de signalement
+- Blocage d'utilisateurs
 
-- **Backend**: Flask + SQLAlchemy
-- **Frontend**: HTML/CSS/JavaScript (Vanilla)
-- **Database**: SQLite
-- **Déploiement**: Render
+### Performance
+- Progressive Web App (installable)
+- Service Worker pour cache offline
+- Lazy loading des images
+- Pagination et infinite scroll
+- Design responsive (mobile-first)
 
-## Installation
+### Design
+- Interface sombre moderne
+- Couleurs AES (vert, rouge, or)
+- Animations et micro-interactions
+- Typographie Poppins + Inter
+- Compatible mobile, tablette et desktop
 
+## Stack Technique
+
+- **Backend**: Flask (Python)
+- **Base de donnees**: SQLite avec SQLAlchemy ORM
+- **Frontend**: HTML5, CSS3, JavaScript vanilla
+- **Auth**: JWT custom
+- **Upload**: Cloudinary (optionnel)
+- **Deploiement**: Render.com
+
+## Configuration
+
+### Variables d'environnement
+```
+SECRET_KEY=<votre_cle_secrete>
+JWT_SECRET=<votre_jwt_secret>
+DATABASE_PATH=/opt/render/project/src/aesconnect.db
+CLOUDINARY_CLOUD_NAME=<optionnel>
+CLOUDINARY_API_KEY=<optionnel>
+CLOUDINARY_API_SECRET=<optionnel>
+```
+
+### Installation locale
 ```bash
 pip install -r requirements.txt
 python app.py
 ```
 
-## Déploiement sur Render
+### Deploiement Render
+1. Connecter le repository GitHub
+2. Configurer les variables d'environnement
+3. Deployer automatiquement
 
-L'application se déploie automatiquement via GitHub.
+## URL de production
+https://aesconnect-1.onrender.com
 
-URL de production: https://aesconnect-1.onrender.com
-
-## Structure
-
-```
-aesconnect/
-├── app.py              # Backend Flask complet (routes + models)
-├── templates/
-│   └── index.html      # Frontend intégré
-├── static/             # Assets CSS/JS/Images (optionnel)
-├── requirements.txt    # Dépendances Python
-├── Procfile            # Configuration Render
-├── render.yaml         # Configuration service Render
-└── README.md           # Documentation
-```
-
-## Auteur
-
-Développé pour la communauté du Sahel 🌍
+## Licence
+Tous droits reserves - AES Connect 2024-2026

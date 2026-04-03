@@ -1,20 +1,16 @@
 services:
   - type: web
     name: aesconnect
-    env: python
-    plan: free
+    runtime: python
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn --bind 0.0.0.0:$PORT app:app
-    healthCheckPath: /api
+    startCommand: gunicorn --bind 0.0.0.0:$PORT app:app --workers 2 --timeout 120 --keep-alive 5
     envVars:
-      - key: FLASK_ENV
-        value: production
-      - key: FLASK_APP
-        value: app.py
+      - key: PYTHON_VERSION
+        value: "3.11.6"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: JWT_SECRET
+        generateValue: true
       - key: DATABASE_PATH
-        value: /opt/render/project/src/social_network.db
-    disk:
-      name: aesconnect-disk
-      size: 1GB
-      mountPath: /opt/render/project/src
-
+        value: /opt/render/project/src/aesconnect.db
+    healthCheckPath: /api/health

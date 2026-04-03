@@ -1,90 +1,26 @@
 {
-  "name": "AESConnect - East Africa Social Network",
+  "name": "AES Connect",
   "short_name": "AESConnect",
-  "description": "Le réseau social des jeunes d'Afrique de l'Est - Connecte, Partage, Inspire",
+  "description": "Le reseau social de l'Alliance des Etats du Sahel - Mali, Burkina Faso, Niger",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#22c55e",
+  "background_color": "#0a0a0a",
+  "theme_color": "#2E8B57",
   "orientation": "portrait-primary",
-  "scope": "/",
-  "lang": "fr-FR",
-  "dir": "ltr",
+  "categories": ["social"],
+  "lang": "fr",
   "icons": [
     {
-      "src": "/static/icons/icon-72x72.png",
-      "sizes": "72x72",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/static/icons/icon-96x96.png",
-      "sizes": "96x96",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/static/icons/icon-128x128.png",
-      "sizes": "128x128",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/static/icons/icon-144x144.png",
-      "sizes": "144x144",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/static/icons/icon-152x152.png",
-      "sizes": "152x152",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/static/icons/icon-192x192.png",
+      "src": "/static/images/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/static/icons/icon-384x384.png",
-      "sizes": "384x384",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/static/icons/icon-512x512.png",
+      "src": "/static/images/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
     }
-  ],
-  "categories": ["social", "lifestyle", "networking"],
-  "screenshots": [],
-  "shortcuts": [
-    {
-      "name": "Créer un post",
-      "short_name": "Post",
-      "description": "Créer une nouvelle publication",
-      "url": "/?action=create-post",
-      "icons": [{ "src": "/static/icons/icon-96x96.png", "sizes": "96x96" }]
-    },
-    {
-      "name": "Messages",
-      "short_name": "Messages",
-      "description": "Voir mes messages",
-      "url": "/?view=messages",
-      "icons": [{ "src": "/static/icons/icon-96x96.png", "sizes": "96x96" }]
-    },
-    {
-      "name": "Groupes",
-      "short_name": "Groupes",
-      "description": "Explorer les groupes",
-      "url": "/?view=groups",
-      "icons": [{ "src": "/static/icons/icon-96x96.png", "sizes": "96x96" }]
-    }
-  ],
-  "related_applications": [],
-  "prefer_related_applications": false
+  ]
 }
