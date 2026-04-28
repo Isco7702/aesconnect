@@ -1,0 +1,5 @@
+browser-port: '9222'
+pull: true
+push: true
+s3-get-url: https://browser-cookie-prod.7f0548f6b28a1758d9bf7be630d36cb4.r2.cloudflarestorage.com/browser_data/310519663120361820/56xAGHtRwzs8e3SfXEi3Yw.json?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=6e92475179554fa63137d0a2eaf1889a%2F20260428%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260428T231608Z&X-Amz-Expires=86400&X-Amz-SignedHeaders=host&x-id=GetObject&X-Amz-Signature=06cfc80187adc6e51060ee1678cf5e453cd68e1ae78dd1a5aa9917aca9c8ff6d
+s3-put-url: https://browser-cookie-prod.7f0548f6b28a1758d9bf7be630d36cb4.r2.cloudflarestorage.com/browser_data/310519663120361820/56xAGHtRwzs8e3SfXEi3Yw.json?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=6e92475179554fa63137d0a2eaf1889a%2F20260428%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260428T231608Z&X-Amz-Expires=86400&X-Amz-SignedHeaders=host&x-id=PutObject&X-Amz-Signature=9051d4769d2fc3e716a85bdb980bb90f52767101f58be98f0ad69ab2dd05999a
