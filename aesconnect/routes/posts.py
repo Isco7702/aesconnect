@@ -8,7 +8,7 @@ from .auth import require_login # Décorateur d'authentification
 posts_bp = Blueprint('posts', __name__, url_prefix='/posts')
 
 # Posts routes
-@posts_bp.route('/posts', methods=['GET'])
+@posts_bp.route('/', methods=['GET'])
 @require_login
 def get_posts():
     """Get all posts (feed)"""
@@ -70,7 +70,7 @@ def get_posts():
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
 
-@posts_bp.route('/posts', methods=['POST'])
+@posts_bp.route('/', methods=['POST'])
 @require_login
 def create_post():
     """Create a new post with optional image upload"""
@@ -110,7 +110,7 @@ def create_post():
         db.session.rollback()
         abort(500, message=str(e))
 
-@posts_bp.route('/posts/<int:post_id>/like', methods=['POST'])
+@posts_bp.route('/<int:post_id>/like', methods=['POST'])
 @require_login
 def toggle_like(post_id):
     """Toggle like on a post"""
@@ -161,7 +161,7 @@ def toggle_like(post_id):
         db.session.rollback()
         abort(500, message=str(e))
 
-@posts_bp.route('/posts/<int:post_id>/comments', methods=['GET'])
+@posts_bp.route('/<int:post_id>/comments', methods=['GET'])
 @require_login
 def get_comments(post_id):
     """Get comments for a post"""
@@ -193,7 +193,7 @@ def get_comments(post_id):
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
 
-@posts_bp.route('/posts/<int:post_id>/comments', methods=['POST'])
+@posts_bp.route('/<int:post_id>/comments', methods=['POST'])
 @require_login
 def add_comment(post_id):
     """Add a comment to a post"""

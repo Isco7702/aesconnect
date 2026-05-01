@@ -1,14 +1,14 @@
 from flask_smorest import Blueprint, abort
 from flask import request, jsonify, session, current_app
 from ..utils.notifications import create_notification
-from ..models import db, User, Post, Comment, Like
+from ..models import db, Group, GroupMember, User
 # from ..database import get_raw_db_connection # Fonctions SQLite brutes (obsolète)
 from .auth import require_login # Décorateur d'authentification
 
 groups_bp = Blueprint('groups', __name__, url_prefix='/groups')
 
 # Groups routes
-@groups_bp.route('/groups', methods=['GET'])
+@groups_bp.route('/', methods=['GET'])
 @require_login
 def get_groups():
     """Get all groups"""
@@ -55,7 +55,7 @@ def get_groups():
         current_app.logger.error(f"Erreur: {e}")
         abort(500, message=str(e))
 
-@groups_bp.route('/groups', methods=['POST'])
+@groups_bp.route('/', methods=['POST'])
 @require_login
 def create_group():
     """Create a new group"""
@@ -101,7 +101,7 @@ def create_group():
         db.session.rollback()
         abort(500, message=str(e))
 
-@groups_bp.route('/groups/<int:group_id>/join', methods=['POST'])
+@groups_bp.route('/<int:group_id>/join', methods=['POST'])
 @require_login
 def join_group(group_id):
     """Join a group"""
