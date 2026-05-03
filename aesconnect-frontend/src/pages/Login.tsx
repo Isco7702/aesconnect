@@ -16,7 +16,9 @@ const Login: React.FC = () => {
     setError('');
     try {
       const response = await api.post('/auth/login', { username, password });
-      login((response.data as { user: User }).user); // Met à jour le contexte avec les données de l'utilisateur
+      const loggedUser = (response.data as { user: User }).user;
+      localStorage.setItem('user_id', String(loggedUser.id));
+      login(loggedUser); // Met à jour le contexte avec les données de l'utilisateur
       navigate('/feed'); // Redirection vers le feed après connexion
     } catch (err: any) {
       setError(err.response?.data?.message || 'Erreur de connexion');
