@@ -2,7 +2,7 @@ import React, { createContext, useState, useContext, useEffect } from 'react';
 import type { User } from '../types';
 import api from '../api/axios';
 
-
+const AUTH_USER_ID_KEY = 'aesconnect_user_id';
 
 interface AuthContextType {
   user: User | null;
@@ -18,16 +18,41 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Vérifie si l'utilisateur est déjà connecté au chargement de l'application
   useEffect(() => {
+    const restoreLocalUser = () => {
+      const storedUserId = localStorage.getItem(AUTH_USER_ID_KEY);
+      if (!storedUserId) {
+        return;
+      }
+
+      setUser((currentUser) => {
+        if (currentUser) {
+          return currentUser;
+        }
+
+        return {
+          id: Number(storedUserId),
+          username: '',
+          full_name: '',
+          email: '',
+          city: '',
+          country: '',
+          avatar_url: '',
+          is_admin: false,
+        };
+      });
+    };
+
     const checkLoginStatus = async () => {
+      restoreLocalUser();
+
       try {
         const response = await api.get('/auth/profile');
-        // La réponse de /auth/profile est l'objet User si connecté
-        setUser(response.data as User);
+        const profileUser = response.data as User;
+        setUser(profileUser);
+        localStorage.setItem(AUTH_USER_ID_KEY, String(profileUser.id));
       } catch (error) {
-        // Si non connecté (401 ou 404), l'utilisateur est null
-        setUser(null);
+        // If profile check fails, keep the restored local user (if present)
       } finally {
         setLoading(false);
       }
@@ -38,19 +63,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = (userData: User) => {
     setUser(userData);
+    localStorage.setItem(AUTH_USER_ID_KEY, String(userData.id));
   };
 
   const logout = async () => {
     try {
       await api.post('/auth/logout');
     } catch (error) {
-      console.error("Erreur lors de la déconnexion côté serveur", error);
+      console.error('Erreur lors de la déconnexion côté serveur', error);
     } finally {
       setUser(null);
+      localStorage.removeItem(AUTH_USER_ID_KEY);
     }
   };
 
-  const isAuthenticated = !!user;
+  const isAuthenticated = !!user?.id;
 
   return (
     <AuthContext.Provider value={{ user, isAuthenticated, login, logout, loading }}>
