@@ -1,0 +1,10 @@
+Flask==3.0.0
+Flask-CORS==4.0.0
+Werkzeug==3.0.1
+gunicorn==21.2.0
+Flask-SQLAlchemy==3.1.1
+SQLAlchemy==2.0.44
+cloudinary==1.36.0
+Flask-Smorest==0.42.3
+marshmallow==3.26.1
+
